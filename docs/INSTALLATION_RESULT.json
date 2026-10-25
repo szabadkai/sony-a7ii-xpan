@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-25T13:31:38.643666+01:00",
+  "model": "ILCE-7M2",
+  "firmware": "4.01",
+  "package": "org.xpan.camera",
+  "installed_version": "0.1.0-prototype",
+  "apk_sha256": "997a0316b6d45d57dd4d0c6345b985dc7e8b1b34472277afced73c1ff0653835",
+  "installer_result": "Task completed successfully; package present in returned application inventory",
+  "host": "macOS 26.6.2 arm64",
+  "method": "PMCA-RE source, libusb, MTP, macOS administrator authentication; installer staged outside Documents",
+  "android_package_version": "4.1.2-323",
+  "scope": "Installation only; launch, preview, capture, RAW and EVF not yet tested"
+}

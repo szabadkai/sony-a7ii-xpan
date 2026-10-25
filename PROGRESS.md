@@ -26,10 +26,17 @@
 
 ## Unverified assumptions and outstanding camera tests
 
-- APK acceptance/launch on actual ILCE-7M2; exact body firmware/runtime/API capabilities.
+- Launch on actual ILCE-7M2 and runtime/API capabilities. Installation and firmware 4.01 are now confirmed.
 - Live preview, AF-S/AF-C, exposure units/dials, native output negotiation, 6000×4000 active RAW and JPEG files actually reaching the card.
 - EVF overlay, eye-sensor switching, physical pixel aspect, VideoRect coordinates, preview field of view and RAW/lens-correction alignment.
 - Callback timing, automatic preview return, full/missing card errors, pause/resume and normal output restoration.
 - Diagnostic external-storage mapping and optional file callback availability.
 
-**No camera was accessed or operated by this project; no installation was attempted.** All hardware acceptance rows remain NOT RUN. Native extra panoramic JPEG and reliable per-file ratio metadata are deferred. This is an installable-format prototype, not a physically validated camera release.
+**The user-authorized installation succeeded on ILCE-7M2 firmware 4.01 via MTP/libusb on macOS. See docs/INSTALLATION_RESULT.json.** Installation is confirmed; launch, capture and EVF acceptance rows remain NOT RUN. Native extra panoramic JPEG and reliable per-file ratio metadata are deferred. This is an installable-format prototype, not a physically validated camera release.
+
+## Physical installation update
+
+- Installed org.xpan.camera 0.1.0-prototype successfully after the user requested installation.
+- Camera returned model ILCE-7M2, firmware 4.01, and the installed package in its application inventory.
+- Mass Storage access failed on this Mac. Switching to MTP and using libusb with normal macOS administrator authorization succeeded. No driver installation or firmware modification was performed.
+- The inventory reports the Android package version as 4.1.2-323; the earlier Android 2.3.7 statement is the upstream compatibility baseline, not a measurement of this body. Build.VERSION.SDK_INT still needs an app diagnostic.

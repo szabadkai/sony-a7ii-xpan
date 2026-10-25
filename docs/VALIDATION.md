@@ -1,6 +1,6 @@
 # Local validation — 2026-10-25
 
-**Result: signed prototype APK built and inspected. All physical-camera behavior remains unverified.**
+**Result: signed prototype APK built and inspected. Installation has subsequently been confirmed on ILCE-7M2 firmware 4.01; app operation remains unverified.**
 
 ## Artifact
 
@@ -15,7 +15,7 @@
 | Signature | apksigner verification passed; v1 true, v2/v3/v4 false; RSA 2048 |
 | Alignment | zipalign 4-byte verification passed |
 | Touchscreen | Explicitly not required |
-| Camera access / install | Not attempted |
+| Camera access / install | Confirmed via MTP/libusb; see INSTALLATION_RESULT.json |
 
 APK SHA-256:
 
@@ -55,7 +55,7 @@ No simulator camera, mocks or fabricated screenshots were used as hardware evide
 | Requirement | Status |
 | --- | --- |
 | Valid reproducible APK build | **PASS locally** |
-| Installs on A7 II | **NOT RUN** |
+| Installs on A7 II | **PASS: ILCE-7M2 firmware 4.01**, package returned in installed-app inventory |
 | Functioning camera preview | **Implemented, NOT RUN on body** |
 | Correctly aligned 65:24 mask | **Math tested; physical alignment NOT RUN** |
 | Physical shutter controls | **Implemented, NOT RUN on body** |
@@ -64,3 +64,7 @@ No simulator camera, mocks or fabricated screenshots were used as hardware evide
 | Safe exit / resource release | **Implemented; physical behavior NOT RUN** |
 
 Use `HARDWARE_TEST.md` to record the missing results. This release remains a prototype until those checks pass.
+
+## Subsequent physical installation
+
+The owner connected the camera and explicitly requested installation. PMCA-RE completed the app install and returned org.xpan.camera 0.1.0-prototype in the device application inventory. Model ILCE-7M2 and firmware 4.01 were returned. The same APK hash above was installed. The inventory labels the Android package 4.1.2-323; this is device-reported package metadata, not a direct Build.VERSION.SDK_INT reading. No firmware, bootloader, calibration, or protected settings were changed. Preview/capture/EVF tests remain pending. Sanitized machine-readable evidence is in INSTALLATION_RESULT.json.

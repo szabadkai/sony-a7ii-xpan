@@ -1,12 +1,12 @@
 # A7 II hardware acceptance checklist
 
-**All hardware rows below are NOT RUN.** Complete this on a physical **ILCE-7M2**. An emulator, desktop crop preview or successful build is not evidence of EVF operation. Do not install automatically from a computer script.
+**Installation is confirmed on ILCE-7M2 firmware 4.01; all app-operation rows below are NOT RUN.** Complete this on a physical **ILCE-7M2**. An emulator, desktop crop preview or successful build is not evidence of EVF operation. Do not install automatically from a computer script.
 
 Record: tester/date, body model, firmware, lens, native exposure/AF/WB settings, card, APK SHA-256, report filename. Keep test images and note filenames. Start with a spare card, a charged battery, a full-frame lens and a short exposure in P mode. Never erase existing images as part of testing.
 
 ## 1. Install and initial preview
 
-- [ ] Check normal PMCA install accepts the signed APK. Record installer version/OS and any error.
+- [x] Normal PMCA install accepted the signed APK on ILCE-7M2 firmware 4.01 via MTP/libusb on macOS 26.6.2. See INSTALLATION_RESULT.json.
 - [ ] Launch from Application List. Record runtime SDK/model from diagnostic report.
 - [ ] LCD shows a responsive sensor preview, with no stretching or unexpected crop.
 - [ ] Status indicates ready RAWJPEG. If disabled, export the actual error; do not bypass it or unlock protected settings.

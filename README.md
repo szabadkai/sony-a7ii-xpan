@@ -1,6 +1,6 @@
 # XPan Mode for Sony A7 II
 
-A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: APK/build verified; camera installation, capture and EVF operation have not been physically verified.**
+A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: APK/build and installation on ILCE-7M2 firmware 4.01 verified; preview, capture and EVF operation still require physical testing.**
 
 - [Signed APK](dist/XPanMode-0.1.0.apk) · [SHA-256](dist/XPanMode-0.1.0.apk.sha256)
 - [Build instructions](docs/BUILD.md)
@@ -40,6 +40,6 @@ Export operates on a full-frame JPEG or developed TIFF/PNG, never an ARW. It ref
 
 ## Evidence boundary
 
-Host tests verify the crop math, lifecycle capture gate, reflection names against upstream SDK declarations, non-overwrite export and APK structure/signing. They cannot validate Sony firmware behavior. The next step is the owner-run LCD/EVF and capture checklist, beginning with a spare card and the magenta C1 probe. No camera has been accessed during development.
+Host tests verify the crop math, lifecycle capture gate, reflection names against upstream SDK declarations, non-overwrite export and APK structure/signing. They cannot validate Sony firmware behavior. The next step is the owner-run LCD/EVF and capture checklist, beginning with a spare card and the magenta C1 probe. The owner-authorized installation has since succeeded; see docs/INSTALLATION_RESULT.json.
 
 MIT license; third-party notices are in `third_party/`.
