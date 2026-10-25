@@ -14,5 +14,9 @@
   "Sony-PMCA-RE": {
     "url": "https://github.com/ma1co/Sony-PMCA-RE",
     "commit": "a82f5baaa8e9c3d9f28f94699e860fb2e48cc8e0"
+  },
+  "TimeLapse": {
+    "url": "https://github.com/jonasjuffinger/TimeLapse",
+    "commit": "c785732b0d328b4dabd61580eeaa1006c5ce18ac"
   }
 }
