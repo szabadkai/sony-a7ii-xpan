@@ -1,0 +1,40 @@
+name: A7 II hardware test
+description: Report observed installation, preview, capture, or EVF behavior
+title: "[Hardware] ILCE-7M2 firmware — result"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a prototype. Report only what you observed. Do not include camera serial numbers, account details, passwords, or unredacted installer JSON. See docs/HARDWARE_TEST.md.
+  - type: input
+    id: version
+    attributes:
+      label: APK version and camera firmware
+      placeholder: "0.1.0-prototype; ILCE-7M2 firmware 4.01"
+    validations:
+      required: true
+  - type: input
+    id: setup
+    attributes:
+      label: Lens and camera settings
+      description: Lens, exposure mode, AF mode, output format, and alignment setting.
+  - type: textarea
+    id: observations
+    attributes:
+      label: Observed results
+      description: Distinguish LCD and EVF, before/during autofocus, after capture, and after eye-sensor switching. Mark anything not tested.
+      value: |
+        Installation:
+        LCD preview and bars:
+        EVF preview and bars:
+        Half-press autofocus:
+        Capture and return to preview:
+        RAW/JPEG dimensions and usability:
+        Exit and native settings restoration:
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Reproduction steps and sanitized evidence
+      description: Include an error message or relevant log excerpt. Remove unique identifiers. Share only images you are comfortable making public.

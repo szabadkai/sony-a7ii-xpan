@@ -2,13 +2,29 @@
 
 A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: APK/build and installation on ILCE-7M2 firmware 4.01 verified; preview, capture and EVF operation still require physical testing.**
 
-- [Signed APK](dist/XPanMode-0.1.0.apk) · [SHA-256](dist/XPanMode-0.1.0.apk.sha256)
+- [Prototype release](https://github.com/szabadkai/sony-a7ii-xpan/releases/tag/v0.1.0-prototype) · [Signed APK](dist/XPanMode-0.1.0.apk) · [SHA-256](dist/XPanMode-0.1.0.apk.sha256)
 - [Build instructions](docs/BUILD.md)
 - [Install / remove / recover](docs/INSTALL.md)
 - [User guide](docs/USER_GUIDE.md)
 - [Hardware test checklist](docs/HARDWARE_TEST.md)
 - [Local validation results](docs/VALIDATION.md)
 - [Research](RESEARCH.md) · [Implementation and limitations](docs/IMPLEMENTATION.md) · [Progress](PROGRESS.md)
+
+## Why this exists
+
+Panoramic composition is easier when the frame is visible while shooting. This project explores a 65:24 viewfinder experience on an existing A7 II, while retaining the full image for later editing. It is an independent project inspired by XPan framing, with no affiliation to Sony, Hasselblad or Fujifilm.
+
+## Hardware status
+
+| Check | Result |
+| --- | --- |
+| Build, signature and clean-source reproduction | Verified |
+| Installation on ILCE-7M2 firmware 4.01 | Verified |
+| Live preview and physical shutter operation | Not yet verified |
+| Full-resolution RAW/JPEG files | Not yet verified |
+| Accurate LCD/EVF mask and eye-sensor switching | Not yet verified |
+
+Reports are welcome through the [hardware-test issue form](https://github.com/szabadkai/sony-a7ii-xpan/issues/new?template=hardware-test.yml). See [contributing](CONTRIBUTING.md) and the [test checklist](docs/HARDWARE_TEST.md); report observations separately for each display.
 
 ## Implemented
 
