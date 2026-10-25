@@ -6,7 +6,7 @@ This is a normal removable PMCA Android application. No camera install or USB op
 2. Start with a charged battery and a spare/test memory card. Keep existing photographs backed up. Set P mode, a full-frame lens, digital zoom 1x, and short exposure for the first test. Exit other camera apps.
 3. Obtain [Sony-PMCA-RE](https://github.com/ma1co/Sony-PMCA-RE/releases). Use **App Installer**, not Tweaks, updater mode or service mode. No OpenMemories-Tweak installation or protected-setting unlock is required.
 4. Set the camera's USB connection to **Mass Storage**, connect a data-capable USB cable, and close Photos/other software claiming the device.
-5. In pmca-gui's **Install app** tab choose **Install apk…** and select `dist/XPanMode-0.1.0.apk`. Alternatively, from PMCA-RE's directory:
+5. In pmca-gui's **Install app** tab choose **Select an apk**, click **Open apk...**, select `dist/XPanMode-0.1.0.apk`, then click **Install selected app**. Alternatively, from PMCA-RE's directory:
 
    ```sh
    python3 pmca-console.py install -f '/absolute/path/to/XPanMode-0.1.0.apk'
