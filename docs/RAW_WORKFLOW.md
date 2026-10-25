@@ -2,7 +2,7 @@
 
 The camera records a full-frame Sony ARW. The desktop companion creates a **new RAW DNG with a 65:24 default crop**, preserving the entire sensor mosaic. On a 6000×4000 image, the displayed crop is 6000×2215. This is a RAW file with crop metadata, not a JPEG stored in a DNG container.
 
-This conversion runs on the computer after importing photos. Version 0.2.0 does not write cropped ARWs or DNGs on the camera. We have not found a supported arbitrary-65:24 ARW capture setting in the inspected Sony APIs. Native panoramic JPEG export remains separate unfinished work.
+This conversion runs on the computer after importing photos. Version 0.2.0 does not write cropped ARWs or DNGs on the camera. We have not found a supported arbitrary-65:24 ARW capture setting in the inspected Sony APIs. On-camera panoramic JPEG export is implemented separately in 0.3.0 and awaits a device test; see ON_CAMERA_JPEG.md.
 
 ## Setup
 

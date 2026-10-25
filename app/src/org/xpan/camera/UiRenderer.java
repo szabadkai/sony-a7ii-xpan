@@ -10,7 +10,7 @@ public final class UiRenderer {
     }
     public static final class State {
         public int width,height,ratio,menuRow;
-        public boolean configured,preview,busy,alert,menu,probe,clean,experimental,sonyRectAvailable;
+        public boolean configured,preview,busy,alert,menu,probe,clean,experimental,sonyRectAvailable,exporting,panorama;
         public String format="rawjpeg",exposure="",status="",focus="",display="";
         public Geometry.Box crop,source;
     }
@@ -77,12 +77,12 @@ public final class UiRenderer {
             label(hint,pad,h-20*u,12*u,MUTED,false,w-pad*2);
         }
         // Clean view never conceals a capture in progress or an error.
-        if(s.busy||s.alert||!s.configured||!s.preview) {
+        if(s.busy||s.exporting||s.alert||!s.configured||!s.preview) {
             float boxW=Math.min(w-pad*2,480*u),left=(w-boxW)/2;
             float y=Math.max(62*u,h-148*u);
             d.round(left,y,left+boxW,y+66*u,6*u,0xf0141716);
             d.rect(left,y+8*u,left+3*u,y+58*u,AMBER);
-            String heading=s.busy?"CAPTURING":(s.alert?"CAMERA MESSAGE":(!s.configured?"CAMERA NOT READY":"STARTING LIVE VIEW"));
+            String heading=s.exporting?"SAVING PANORAMA":s.busy?"CAPTURING":(s.alert?"CAMERA MESSAGE":(!s.configured?"CAMERA NOT READY":"STARTING LIVE VIEW"));
             label(heading,left+14*u,y+21*u,12*u,AMBER,true,boxW-28*u);
             wrap(s.status,left+14*u,y+42*u,12*u,INK,boxW-28*u,2);
         }
@@ -105,23 +105,24 @@ public final class UiRenderer {
         label("XPan Mode",pad+55*u,39*u,23*u,INK,true,w-pad*2-140*u);
         right("SETTINGS",w-pad,36*u,11*u,AMBER,true,100*u);
         d.rect(pad,60*u,w-pad,61*u,LINE);
-        String[] titles={"Frame","File format","Preview alignment","Export diagnostics","Restart camera"};
+        String[] titles={"Frame","File format","Panorama JPEG","Preview alignment","Export diagnostics","Restart camera"};
         String[] values={RATIOS[s.ratio]+"  /  "+NAMES[s.ratio],"rawjpeg".equals(s.format)?"RAW + JPEG":"JPEG only",
-            s.experimental?"Sony rectangle *":"Surface","PRESS CENTER","PRESS CENTER"};
+            s.panorama?"On *":"Off",s.experimental?"Sony rectangle *":"Surface","PRESS CENTER","PRESS CENTER"};
         String[] help={"Choose a frame with LEFT / RIGHT. Full-size photographs are retained.",
             "rawjpeg".equals(s.format)?"RAW + JPEG keeps the full sensor image for later editing.":"JPEG only: no RAW file will be saved. LEFT / RIGHT to change.",
+            s.panorama?"Adds a cropped JPEG in XPAN/PANORAMAS after capture. Experimental; keeps originals.":"Save full-frame originals only. LEFT / RIGHT enables the extra cropped JPEG.",
             s.experimental?"Experimental device coordinates. Validate on both displays before trusting this alignment.":"Mask follows the fitted live-image surface. Hardware alignment still needs validation.",
             "Save a new report to the XPAN folder. Remove private details before sharing.",
             "Release and reopen the camera if preview or configuration failed."};
-        for(int i=0;i<5;i++) {
-            float y=(78+i*52)*u;boolean selected=i==s.menuRow;
+        for(int i=0;i<6;i++) {
+            float y=(72+i*44)*u;boolean selected=i==s.menuRow;
             if(selected) {
-                d.round(pad-8*u,y,w-pad+8*u,y+46*u,5*u,0xff2d322b);
-                d.rect(pad-8*u,y+8*u,pad-5*u,y+38*u,AMBER);
+                d.round(pad-8*u,y,w-pad+8*u,y+40*u,5*u,0xff2d322b);
+                d.rect(pad-8*u,y+8*u,pad-5*u,y+32*u,AMBER);
             }
             float valueWidth=w*.49f;
-            label(titles[i],pad+8*u,y+29*u,18*u,selected?INK:MUTED,selected,w-pad*2-valueWidth-22*u);
-            right(values[i],w-pad-8*u,y+29*u,i<3?16*u:11*u,selected?AMBER:MUTED,i==0,valueWidth);
+            label(titles[i],pad+8*u,y+26*u,18*u,selected?INK:MUTED,selected,w-pad*2-valueWidth-22*u);
+            right(values[i],w-pad-8*u,y+26*u,i<4?16*u:11*u,selected?AMBER:MUTED,i==0,valueWidth);
         }
         wrap(help[s.menuRow],pad,366*u,14*u,INK,w-pad*2,2);
         if(s.status.length()>0&&!s.status.startsWith("Ready"))

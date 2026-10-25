@@ -57,3 +57,11 @@
 - Tested one ARW read from the connected ILCE-7M2: 6000×2215 default crop, unchanged RAW pixel checksum, matching encoded RAW segments and byte-identical recovery of the embedded original. macOS ImageIO renders the panoramic crop correctly.
 - Added four RAW workflow tests; all ten Python tests and 125,022 Java checks pass. Personal sample files are excluded from Git.
 - Camera APK remains 0.2.0. The new conversion runs on the computer after import; in-camera JPEG export is still unfinished.
+
+## On-camera JPEG implementation — 0.3.0
+
+- Added an enabled-by-default Panorama JPEG setting, per-shot ratio snapshot, new-image identification and automatic additional JPEG export after native capture.
+- Selected Android region decoding and strip encoding instead of relying on undocumented Sony image-filter ownership. No full-frame Android bitmap or new native library is required.
+- Added tested baseline JPEG strip assembly with restart markers, output dimension validation, unique files, cancellation and preview/capture coordination.
+- Output is under XPAN/PANORAMAS in reported external storage. Sony playback indexing is not implemented; actual file visibility needs testing.
+- API-10 build, DEX/v1 signature/alignment, existing tests and JPEG strip tests pass. 0.3.0 is not installed or hardware-validated yet. See docs/ON_CAMERA_JPEG.md.

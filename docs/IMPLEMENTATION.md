@@ -6,6 +6,8 @@
 - `MainActivity.java`: SurfaceView, Android Canvas mask, physical controls, parameter snapshot/restore, callbacks, app preferences, bounded diagnostic logs and display listener.
 - `UiRenderer.java`: shared mask/HUD/settings drawing with measured text wrapping and truncation, warm high-contrast colors and clean view. Android Canvas is the production adapter; Java2D is only a host layout preview tool.
 - `Geometry.java`: integer sensor crop and mapping into a fitted live-image rectangle, with physical display pixel aspect correction.
+- `PanoramaExport.java`: optional post-capture provider read and strip-based JPEG export, unique files and bounded/cancellable processing.
+- `JpegStripWriter.java`: validates and joins matching baseline JPEG strips using restart markers.
 - `CaptureGate.java`: single capture at a time, generation numbers that reject callbacks from an old camera session.
 - `tools/crop.py`: separate desktop rendered-image export; never reads/writes ARW or installs anything.
 - `tools/raw_panorama.py`: desktop ARW-to-RAW-DNG conversion using external DNGLab, followed by verified default-crop metadata editing. Full sensor data and the original ARW are retained; details in RAW_WORKFLOW.md.
@@ -38,7 +40,7 @@ UI has no touchscreen dependency. Five aspect ratios and output preferences pers
 
 1. Versions 0.1.0 and 0.2.0 installation are verified on ILCE-7M2 firmware 4.01. The owner reports launch, preview and shutter capture working in 0.2.0. EVF overlays, eye sensor, mask alignment and release behavior still need focused tests.
 2. No firmware-wide compatibility claim. Third-party A7 II reports do not identify every firmware/API revision.
-3. Native extra cropped JPEG is investigated but not implemented; desktop export is the safe first phase.
+3. Additional on-camera cropped JPEG export is implemented in 0.3.0 and host-tested, but device provider/encoder/storage behavior remains unverified; see ON_CAMERA_JPEG.md.
 4. No automatic per-file ratio metadata association. Diagnostic capture intentions are not authoritative file metadata.
 5. Full native camera UI, playback, movies, burst, HDR/bracketing and touch control are not implemented. Single-shot is intentional.
 6. Lens corrections and RAW development can change field of view; crop geometry alone cannot undo them.
@@ -48,4 +50,4 @@ UI has no touchscreen dependency. Five aspect ratios and output preferences pers
 
 ## Non-goals enforced in code
 
-No firmware partitions, bootloaders, native memory, sensor calibration, protected backup parameters, system patches, network services, installer automation, or photo deletion. External file writes are uniquely named app diagnostic reports only; photo capture is delegated to Sony's normal camera API.
+No firmware partitions, bootloaders, native memory, sensor calibration, protected backup parameters, system patches, network services, installer automation, or photo deletion. External file writes are uniquely named app diagnostic reports and new panoramic JPEG copies. Original photo capture remains delegated to Sony's normal camera API; source images are read-only.

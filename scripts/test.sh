@@ -8,5 +8,7 @@ fi
 mkdir -p build/tests
 "$JAVA_HOME/bin/javac" -d build/tests app/src/org/xpan/camera/Geometry.java app/src/org/xpan/camera/CaptureGate.java tests/CoreTest.java
 "$JAVA_HOME/bin/java" -cp build/tests CoreTest
+"$JAVA_HOME/bin/javac" -d build/tests app/src/org/xpan/camera/JpegStripWriter.java app/src/org/xpan/camera/PanoramaFiles.java tests/JpegStripTest.java
+"$JAVA_HOME/bin/java" -Djava.awt.headless=true -cp build/tests org.xpan.camera.JpegStripTest
 PY="${XPAN_PYTHON:-python3}"
 "$PY" -m unittest discover -s tests -p 'test_*.py' -v

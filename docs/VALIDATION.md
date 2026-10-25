@@ -1,5 +1,20 @@
 # Local validation — 2026-10-25
 
+## 0.3.0 on-camera JPEG export build
+
+**Built and host-tested; installation and on-camera export remain unverified.**
+
+- Package versionCode 3; API 10, DEX 035, 47 application classes; no packaged Sony implementations or native libraries.
+- v1 signature, retained signer identity and ZIP alignment pass.
+- Source-only rebuild in a fresh temporary directory, using the pinned tools and retained key, produced identical unsigned and signed APKs.
+- 125,022 Java core checks; all ten Python tests; JPEG strip interoperability tests checking 1,035,508 decoded pixels, odd dimensions, restart-marker cycles, mismatched tables, truncation and nonmonotonic image IDs pass.
+- Re-encoding a real photograph through the shared strip assembler and decoding through Java ImageIO gave a mean absolute channel error of 0.582 / 255. This tests the host codec/assembler, not Sony's Android encoder.
+- Generated 40 host UI renders and inspected the panorama setting and saving-progress layouts.
+- APK SHA-256: `3846dd1e6af9305d229ebc18f3b24731aa09f2ba0dc4333993d1366890d559fa`.
+- Unsigned payload SHA-256: `14dcb9172727f5fec7f08b208fe3ff971e3b1bf8bfc9fefa7672aeed591ecfe4`.
+
+See [ON_CAMERA_JPEG.md](ON_CAMERA_JPEG.md) for the required device test and storage/playback limitations.
+
 ## Panoramic RAW and owner feedback
 
 The owner subsequently confirmed 0.2.0 live preview and shutter capture work. A real ARW retrieved from the connected camera was converted into a 6000×2215 default-cropped CFA RAW DNG with identical decoded pixel checksums and a recoverable byte-identical embedded original. macOS ImageIO honored the panoramic crop. See [RAW_WORKFLOW.md](RAW_WORKFLOW.md) for exact scope and remaining limits. All ten Python tests and 125,022 Java checks passed. No new APK was installed for this desktop workflow.

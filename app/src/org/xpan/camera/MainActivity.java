@@ -31,7 +31,17 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private String format="rawjpeg", status="Opening camera", exposure="Exposure pending", focus="";
     private String displayName="Unknown display", originalFormat, originalAspect, originalSize, originalDrive, originalApsc;
     private String shootingRatio;
-    private boolean useSonyRect, cleanView, statusAlert;
+    private boolean useSonyRect, cleanView, statusAlert, panoramaJpeg;
+    private PanoramaExport pendingExporter;
+    private long[] pendingImages;
+    private int pendingRatio;
+    private String panoramaPreparationError;
+    private Thread exportThread;
+    private final Runnable reopenAfterExport=new Runnable(){public void run(){
+        if(!resumed)return;
+        if(PanoramaExport.isBusy()){handler.postDelayed(this,200);return;}
+        exportThread=null;openCamera();
+    }};
     private double pixelAspect=1.0;
     private Geometry.Box imageBox=new Geometry.Box(0,0,0,0), sonyBox;
 
@@ -44,6 +54,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         format=prefs.getBoolean("jpeg",false)?"jpeg":"rawjpeg";
         useSonyRect=prefs.getBoolean("sonyRect",false);
         cleanView=prefs.getBoolean("cleanView",false);
+        panoramaJpeg=prefs.getBoolean("panoramaJpeg",true);
         root=new FrameLayout(this) {
             @Override protected void onSizeChanged(int w,int h,int ow,int oh) {
                 super.onSizeChanged(w,h,ow,oh);
@@ -58,10 +69,10 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         overlay=new Overlay();
         root.addView(overlay,new FrameLayout.LayoutParams(-1,-1));
         setContentView(root);
-        note("Build 0.2.0; model="+Build.MODEL+" device="+Build.DEVICE+" SDK="+Build.VERSION.SDK_INT+" Android="+Build.VERSION.RELEASE);
+        note("Build 0.3.0; model="+Build.MODEL+" device="+Build.DEVICE+" SDK="+Build.VERSION.SDK_INT+" Android="+Build.VERSION.RELEASE);
     }
     @Override protected void onResume() {
-        super.onResume(); resumed=true; gate.open();shootingRatio=null;exposureRefreshPending=false;
+        super.onResume(); resumed=true;if(!PanoramaExport.isBusy())exportThread=null; gate.open();shootingRatio=null;exposureRefreshPending=false;
         note("resume session="+gate.token());
         Intent info=new Intent("com.android.server.DAConnectionManagerService.AppInfoReceive");
         info.putExtra("package_name",getPackageName());info.putExtra("class_name",getComponentName().getClassName());sendBroadcast(info);
@@ -69,6 +80,10 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         openCamera();
     }
     private void openCamera() {
+        if(PanoramaExport.isBusy()) {
+            status="Finishing previous panorama export";overlay.invalidate();
+            handler.removeCallbacks(reopenAfterExport);handler.postDelayed(reopenAfterExport,200);return;
+        }
         originalFormat=null;originalAspect=null;originalSize=null;originalDrive=null;originalApsc=null;
         try {
             sony=new Sony();
@@ -133,6 +148,11 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             sony.listen("setPreviewStartListener","PreviewStartListener",new Sony.Event(){public void receive(String m,Object[] args) {
                 handler.post(new Runnable(){public void run(){
                     if(!gate.current(token))return;
+                    if(isExporting()) {
+                        preview=false;
+                        try{if(sony!=null)sony.camera.stopPreview();}catch(RuntimeException e){note("pause auto-preview: "+e);}
+                        return;
+                    }
                     note("native preview start");preview=true;updateDisplay();overlay.invalidate();
                 }});
             }});
@@ -163,13 +183,51 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         if(!gate.end(token))return;
         handler.removeCallbacks(captureWatchdog);
         if(!focusHeld && sony!=null)try{sony.camera.cancelAutoFocus();}catch(RuntimeException e){note("AF release: "+e);}
-        status=message;statusAlert=false;focus="";preview=false;startPreview();updateExposure();overlay.invalidate();
+        status=message;statusAlert=false;focus="";preview=false;
+        if(pendingExporter!=null&&pendingImages!=null)beginPanoramaExport();
+        else {startPreview();if(panoramaPreparationError!=null)fail(panoramaPreparationError,null);}
+        updateExposure();overlay.invalidate();
+    }
+    private boolean isExporting(){return exportThread!=null||PanoramaExport.isBusy();}
+    private static String exportError(Throwable error) {
+        for(int i=0;i<8&&error.getCause()!=null;i++)error=error.getCause();
+        return error.getClass().getSimpleName()+": "+error.getMessage();
+    }
+    private void beginPanoramaExport() {
+        final PanoramaExport exporter=pendingExporter;final long[] before=pendingImages;final int selectedRatio=pendingRatio;
+        pendingExporter=null;pendingImages=null;
+        if(!PanoramaExport.acquire()){fail("Panorama export already running",null);startPreview();return;}
+        try{if(sony!=null)sony.camera.stopPreview();}catch(RuntimeException e){note("pause preview: "+e);}
+        preview=false;status="Waiting for saved JPEG";
+        final int token=gate.token();
+        try {exportThread=new Thread(new Runnable(){public void run(){
+            String result;boolean failed=false;
+            try {
+                result=exporter.export(before,selectedRatio,new PanoramaExport.Progress(){public void update(final String message){
+                    handler.post(new Runnable(){public void run(){if(resumed&&gate.current(token)){status=message;overlay.invalidate();}}});
+                }});
+            }catch(Exception e){result="Panorama failed; originals retained: "+exportError(e);failed=true;}
+            catch(OutOfMemoryError e){result="Panorama needs more memory; originals retained";failed=true;}
+            catch(LinkageError e){result="Panorama API unavailable; originals retained";failed=true;}
+            finally{PanoramaExport.unlock();}
+            final String finalResult=result;final boolean finalFailed=failed;
+            handler.post(new Runnable(){public void run(){
+                exportThread=null;note(finalResult);savePrivateLog();
+                if(!resumed||!gate.current(token))return;
+                status=finalResult;statusAlert=true;
+                if(finalFailed)note("Disable Panorama JPEG in settings to shoot originals only");
+                startPreview();overlay.invalidate();
+            }});
+        }},"XPan JPEG export");
+        exportThread.start();
+        }catch(RuntimeException e){exportThread=null;PanoramaExport.unlock();fail("Cannot start panorama export",e);startPreview();}
+        catch(OutOfMemoryError e){exportThread=null;PanoramaExport.unlock();fail("Not enough memory for panorama export",e);startPreview();}
     }
     private static String codes(Object[] args) {
         StringBuilder b=new StringBuilder();for(Object a:args)if(a instanceof Number)b.append(a).append(' ');return b.toString();
     }
     private void startPreview() {
-        if(!resumed||sony==null||!surfaceReady||preview||gate.busy())return;
+        if(!resumed||sony==null||!surfaceReady||preview||gate.busy()||isExporting())return;
         try { sony.camera.setPreviewDisplay(surface.getHolder());sony.camera.startPreview();preview=true;note("preview requested");updateDisplay(); }
         catch(Exception e) { fail("Preview failed: centre retry",e); }
     }
@@ -180,7 +238,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         if(sony!=null&&!gate.busy())try{sony.camera.stopPreview();}catch(RuntimeException e){note("stop preview: "+e);}
     }
     @Override protected void onPause() {
-        resumed=false;boolean wasBusy=gate.busy();gate.close();handler.removeCallbacksAndMessages(null);
+        resumed=false;boolean wasBusy=gate.busy()||isExporting();gate.close();handler.removeCallbacksAndMessages(null);
+        if(exportThread!=null)exportThread.interrupt();pendingExporter=null;pendingImages=null;
         closeCamera(!wasBusy);closeDisplay();focusHeld=false;fullHeld=false;focus="";
         note("paused: resources released");savePrivateLog();super.onPause();
     }
@@ -270,7 +329,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         overlay.invalidate();
     }
     private void autofocus(boolean start) {
-        if(sony==null||!preview||gate.busy())return;
+        if(sony==null||!preview||gate.busy()||isExporting())return;
         try {
             if(start) {
                 if("manual".equals(sony.camera.getParameters().getFocusMode())){focus="MF";overlay.invalidate();return;}
@@ -286,12 +345,18 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         if(gate.busy()) {status="Still waiting: do not remove card; MENU exit";note("capture callback timeout; no automatic restart");overlay.invalidate();}
     }};
     private void shoot() {
-        if(!configured||!preview||sony==null||!gate.begin())return;
+        if(!configured||!preview||sony==null||isExporting()||!gate.begin())return;
+        pendingExporter=null;pendingImages=null;panoramaPreparationError=null;pendingRatio=ratio;
+        if(panoramaJpeg&&ratio!=4)try {
+            pendingExporter=new PanoramaExport(getContentResolver());pendingImages=pendingExporter.snapshot();
+        }catch(Exception e){pendingExporter=null;pendingImages=null;panoramaPreparationError="Photo captured; panorama unavailable: "+exportError(e);}
+        catch(LinkageError e){pendingExporter=null;pendingImages=null;panoramaPreparationError="Photo captured; panorama API unavailable";}
+        catch(OutOfMemoryError e){pendingExporter=null;pendingImages=null;panoramaPreparationError="Photo captured; not enough memory for panorama export";}
         menu=false;shootingRatio=Geometry.LABELS[ratio];
         note("shutter composition="+shootingRatio+" crop="+Geometry.crop(imageW,imageH,Geometry.RATIOS[ratio][0],Geometry.RATIOS[ratio][1]));
         savePrivateLog();statusAlert=false;status="Capturing";
         try {sony.camera.takePicture(null,null,null);handler.postDelayed(captureWatchdog,60000);}
-        catch(RuntimeException e){gate.end(gate.token());fail("Capture refused",e);}
+        catch(RuntimeException e){pendingExporter=null;pendingImages=null;gate.end(gate.token());fail("Capture refused",e);}
         overlay.invalidate();
     }
     @Override public boolean onKeyDown(int key,KeyEvent event) {
@@ -301,23 +366,24 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         if(scan==518||key==KeyEvent.KEYCODE_CAMERA){if(!fullHeld){fullHeld=true;shoot();}return true;}
         if(scan==514||key==KeyEvent.KEYCODE_BACK){if(event.getRepeatCount()==0){if(menu)menu=false;else finish();overlay.invalidate();}return true;}
         if(event.getRepeatCount()>0)return true;
-        if(gate.busy())return true;
+        if(gate.busy()||isExporting())return true;
         if(scan==622){probe=!probe;note("probe="+probe);overlay.invalidate();return true;}
         if(scan==520){ratio=(ratio+1)%5;persist();overlay.invalidate();return true;}
         if(scan==232||key==KeyEvent.KEYCODE_DPAD_CENTER) {
-            if(menu&&menuRow==3)exportLog();
-            else if(menu&&menuRow==4)retry();
+            if(menu&&menuRow==4)exportLog();
+            else if(menu&&menuRow==5)retry();
             else menu=!menu;
             overlay.invalidate();return true;
         }
         int step=(scan==106||key==KeyEvent.KEYCODE_DPAD_RIGHT)?1:(scan==105||key==KeyEvent.KEYCODE_DPAD_LEFT)?-1:0;
         if(menu) {
-            if(scan==103||key==KeyEvent.KEYCODE_DPAD_UP)menuRow=(menuRow+4)%5;
-            else if(scan==108||key==KeyEvent.KEYCODE_DPAD_DOWN)menuRow=(menuRow+1)%5;
+            if(scan==103||key==KeyEvent.KEYCODE_DPAD_UP)menuRow=(menuRow+5)%6;
+            else if(scan==108||key==KeyEvent.KEYCODE_DPAD_DOWN)menuRow=(menuRow+1)%6;
             else if(step!=0){
                 if(menuRow==0)ratio=(ratio+step+5)%5;
                 if(menuRow==1){format="rawjpeg".equals(format)?"jpeg":"rawjpeg";if(sony!=null){configure();if(!completionListener){configured=false;status="Capture disabled: completion API unavailable";}}}
-                if(menuRow==2){useSonyRect=!useSonyRect;updateDisplay();}
+                if(menuRow==2)panoramaJpeg=!panoramaJpeg;
+                if(menuRow==3){useSonyRect=!useSonyRect;updateDisplay();}
                 persist();
             }
             overlay.invalidate();return true;
@@ -339,10 +405,10 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         return super.onKeyUp(key,event);
     }
     private void retry() {
-        if(gate.busy())return;
+        if(gate.busy()||isExporting())return;
         closeCamera();gate.close();gate.open();closeDisplay();openDisplay();openCamera();menu=false;
     }
-    private void persist(){prefs.edit().putInt("ratio",ratio).putBoolean("jpeg","jpeg".equals(format)).putBoolean("sonyRect",useSonyRect).putBoolean("cleanView",cleanView).commit();}
+    private void persist(){prefs.edit().putInt("ratio",ratio).putBoolean("jpeg","jpeg".equals(format)).putBoolean("sonyRect",useSonyRect).putBoolean("cleanView",cleanView).putBoolean("panoramaJpeg",panoramaJpeg).commit();}
     private void fail(String message,Throwable e){statusAlert=true;status=message;note(message+(e==null?"":": "+e));if(overlay!=null)overlay.invalidate();}
     private void note(String message){Log.i("XPan",message);log.append(System.currentTimeMillis()).append(' ').append(message).append('\n');if(log.length()>60000)log.delete(0,log.length()-48000);}
     private void savePrivateLog(){try{FileOutputStream out=openFileOutput("diagnostics.txt",MODE_PRIVATE);out.write(log.toString().getBytes("UTF-8"));out.close();}catch(IOException e){Log.e("XPan","save log",e);}}
@@ -377,6 +443,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             canvas=c;
             state.width=getWidth();state.height=getHeight();state.ratio=ratio;state.menuRow=menuRow;
             state.configured=configured;state.preview=preview;state.busy=gate.busy();state.alert=statusAlert;
+            state.exporting=isExporting();state.panorama=panoramaJpeg;
             state.menu=menu;state.probe=probe;state.clean=cleanView;state.experimental=useSonyRect;
             state.sonyRectAvailable=sonyBox!=null;state.format=format;state.exposure=exposure;
             state.status=status;state.focus=focus;state.display=displayName;

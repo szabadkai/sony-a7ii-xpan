@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0-prototype
+
+- Optional on-camera cropped JPEG after native capture, enabled by default; full RAW/JPEG originals remain intact.
+- Memory-bounded strip processing, quality-95 output, orientation and supported EXIF copying.
+- New uniquely named files under XPAN/PANORAMAS, progress display, cancellation and capture blocking during export.
+- Host tests pass; camera installation, crop output, storage visibility and playback remain unverified.
+
 ## Desktop RAW companion
 
 - Create a new panoramic CFA RAW DNG from an A7 II ARW or fresh full-frame DNG.

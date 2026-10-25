@@ -39,6 +39,10 @@ Settings → Export diagnostics → Centre writes a new uniquely named `XPAN/dia
 
 Restart camera releases/reopens the camera and renegotiates the settings. It is disabled while a capture is pending. If a callback is missing, the app waits and shows a timeout message rather than repeatedly triggering the shutter.
 
+## Cropped JPEGs on the camera (0.3.0)
+
+**Panorama JPEG** in settings enables an extra cropped JPEG after each shot (default On). For 65:24 the expected size is 6000×2215. The originals remain full-frame; 3:2 does not add a duplicate. Wait for saving progress to finish. The result is placed under `XPAN/PANORAMAS` in reported external storage, with its path in the status/log. Camera playback indexing is not implemented. This new path still needs an A7 II device test; see [details and checklist](ON_CAMERA_JPEG.md). Disable the option to return to capture-only operation.
+
 ## Panoramic RAW files
 
 Use the [RAW DNG companion](RAW_WORKFLOW.md) to make a new RAW file that opens with the selected panoramic crop, preserving the full sensor mosaic and the original ARW. This is a desktop conversion after import; the app does not record cropped ARWs on the card.

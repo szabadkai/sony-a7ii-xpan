@@ -30,8 +30,8 @@ Downloads go to `.toolchain/downloads`; every archive is verified against SHA-25
 
 Output names follow `versionName` in the manifest. Current outputs:
 
-- `dist/XPanMode-0.2.0-prototype.apk` — signed installable-format prototype.
-- `dist/XPanMode-0.2.0-prototype.apk.sha256` — digest.
+- `dist/XPanMode-0.3.0-prototype.apk` — signed installable-format prototype.
+- `dist/XPanMode-0.3.0-prototype.apk.sha256` — digest.
 - `build/unsigned.apk` — reproducible aligned unsigned payload.
 - `build/badging.txt` — package, permissions, SDK and launcher inspection.
 - `build/signature.txt` — verification and certificate fingerprint.
@@ -71,4 +71,4 @@ The initial historical build-tools URL returned 404; Google's repository metadat
 
 The launcher icon source is `assets/icon.svg`; six density-specific PNGs are checked in under `app/res/`. Normal builds need no image tooling. To regenerate them, install librsvg and run `python3 scripts/render-icon.py`.
 
-Run `./scripts/preview-ui.sh` for 32 host previews in `build/ui-preview/`, covering four viewport sizes and shooting, settings, clean, error, full-frame, probe, JPEG and fallback states. This uses the production `UiRenderer` through a Java2D adapter; it does not simulate camera behavior or establish Android font/EVF rendering. The adapter is not compiled into the APK.
+Run `./scripts/preview-ui.sh` for 40 host previews in `build/ui-preview/`, covering four viewport sizes and shooting, settings, clean, error, full-frame, probe, JPEG, fallback, panorama settings and saving-progress states. This uses the production `UiRenderer` through a Java2D adapter; it does not simulate camera behavior or establish Android font/EVF rendering. The adapter is not compiled into the APK.

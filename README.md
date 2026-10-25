@@ -1,10 +1,11 @@
 # XPan Mode for Sony A7 II
 
-A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: 0.2.0 builds and passes host checks. Versions 0.1.0 and 0.2.0 were installed on ILCE-7M2 firmware 4.01; the owner confirms live preview and shutter capture. EVF operation and precise framing alignment still require testing.**
+A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: 0.3.0 builds and passes host checks; on-camera JPEG export awaits a device test. Versions 0.1.0 and 0.2.0 were installed on ILCE-7M2 firmware 4.01; the owner confirms live preview and shutter capture. EVF operation and precise framing alignment still require testing.**
 
-- [Prototype release](https://github.com/szabadkai/sony-a7ii-xpan/releases/tag/v0.2.0-prototype) · [Signed APK](dist/XPanMode-0.2.0-prototype.apk) · [SHA-256](dist/XPanMode-0.2.0-prototype.apk.sha256)
+- [Prototype release](https://github.com/szabadkai/sony-a7ii-xpan/releases/tag/v0.3.0-prototype) · [Signed APK](dist/XPanMode-0.3.0-prototype.apk) · [SHA-256](dist/XPanMode-0.3.0-prototype.apk.sha256)
 - [Build instructions](docs/BUILD.md)
 - [Install / remove / recover](docs/INSTALL.md)
+- [On-camera panoramic JPEG export](docs/ON_CAMERA_JPEG.md)
 - [User guide](docs/USER_GUIDE.md) · [Panoramic RAW DNG workflow](docs/RAW_WORKFLOW.md)
 - [Hardware test checklist](docs/HARDWARE_TEST.md)
 - [Local validation results](docs/VALIDATION.md)
@@ -29,9 +30,10 @@ Panoramic composition is easier when the frame is visible while shooting. This p
 
 | Check | Result |
 | --- | --- |
-| 0.2.0 build, signature and source reproduction | Verified locally |
+| 0.3.0 build, signature and source reproduction | Verified locally |
 | Installation on ILCE-7M2 firmware 4.01 | 0.1.0 and 0.2.0 verified |
 | Live preview and physical shutter operation | Owner reports working in 0.2.0 |
+| 0.3.0 on-camera cropped JPEG export | Implemented; device test pending |
 | RAW processing | One camera ARW converted to panoramic RAW DNG; pixel checksums match |
 | Accurate LCD/EVF mask and eye-sensor switching | Not yet verified |
 
@@ -53,6 +55,10 @@ python3 scripts/bootstrap.py
 ```
 
 The bootstrap installs a pinned, checksum-verified toolchain under `.toolchain/`, not globally. The APK uses API 10, DEX 035 and v1 signing. No Gradle, NDK, AndroidX or firmware libraries are bundled. A reusable local signing key is created in `.keys/`; keep it for future updates.
+
+## Cropped JPEGs on the camera
+
+Version 0.3.0 adds **Panorama JPEG → On** (default): after capture it attempts to create a new 6000×2215 JPEG for 65:24, retaining the full-frame originals. The export uses short strips to limit memory use and writes into `XPAN/PANORAMAS`. Native camera playback indexing and storage visibility remain unverified. [Usage and focused device test](docs/ON_CAMERA_JPEG.md).
 
 ## Panoramic RAW output
 

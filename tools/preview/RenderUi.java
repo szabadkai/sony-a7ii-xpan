@@ -18,7 +18,7 @@ public final class RenderUi implements UiRenderer.Drawing {
     public static void main(String[] args)throws Exception {
         File dir=new File(args.length>0?args[0]:"build/ui-preview");dir.mkdirs();
         for(int[] size:new int[][]{{640,480},{640,360},{320,240},{960,720}}) {
-            for(String mode:new String[]{"shooting","settings","error","clean","full-frame","probe","jpeg-warning","alignment-fallback"}) {
+            for(String mode:new String[]{"shooting","settings","error","clean","full-frame","probe","jpeg-warning","alignment-fallback","panorama-settings","panorama-progress"}) {
                 BufferedImage image=new BufferedImage(size[0],size[1],BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g=image.createGraphics();g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -27,7 +27,9 @@ public final class RenderUi implements UiRenderer.Drawing {
                 for(int i=0;i<size[1];i+=size[1]/8)g.drawLine(0,i,size[0],i);
                 UiRenderer.State s=new UiRenderer.State();s.width=size[0];s.height=size[1];s.configured=true;s.preview=true;
                 s.exposure="f/5.6   1/250s   ISO 100";s.status="Ready";s.focus="AF OK";s.display="FINDER";
-                s.menu="settings".equals(mode)||"jpeg-warning".equals(mode);s.menuRow=s.menu?1:0;
+                s.menu="settings".equals(mode)||"jpeg-warning".equals(mode);s.menuRow=s.menu?1:0;s.panorama=true;
+                if("panorama-settings".equals(mode)){s.menu=true;s.menuRow=2;}
+                if("panorama-progress".equals(mode)){s.exporting=true;s.preview=false;s.status="Saving panorama 60%";}
                 s.ratio="full-frame".equals(mode)?4:0;s.clean="clean".equals(mode)||"error".equals(mode);
                 s.probe="probe".equals(mode)||"alignment-fallback".equals(mode);s.experimental="alignment-fallback".equals(mode);
                 if("jpeg-warning".equals(mode))s.format="jpeg";
@@ -38,6 +40,6 @@ public final class RenderUi implements UiRenderer.Drawing {
                 ImageIO.write(image,"png",new File(dir,mode+"-"+size[0]+"x"+size[1]+".png"));
             }
         }
-        System.out.println("Rendered 32 host previews from production UiRenderer; no camera behavior simulated");
+        System.out.println("Rendered 40 host previews from production UiRenderer; no camera behavior simulated");
     }
 }
