@@ -74,6 +74,10 @@ final class Sony {
         setSupported(supported,m,"getSupportedImageSizes","setImageSize","large");
         setSupported(supported,m,"getSupportedPictureStorageFormats","setPictureStorageFormat",format);
         setSupported(supported,m,"getSupportedDriveModes","setDriveMode","single");
+        if(Boolean.TRUE.equals(call(m,"isApscModeSupported")))
+            call(m,"setApscMode",new Class<?>[]{String.class},"off");
+        if(p.isZoomSupported() && p.getZoom()!=0)
+            throw new IllegalStateException("Set digital zoom to 1x in the native camera before launch");
         // Native image-size/aspect setters, not a guessed 6000x4000 Android picture-size key.
         camera.setParameters(p);
         Object actual=modifier(camera.getParameters());

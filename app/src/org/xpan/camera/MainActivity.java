@@ -21,15 +21,15 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private final StringBuilder log=new StringBuilder();
     private SharedPreferences prefs;
     private Sony sony;
-    private Object displayManager, displayListener;
+    private Object displayManager, displayListener, layoutListener;
     private SurfaceView surface;
     private Overlay overlay;
     private FrameLayout root;
     private boolean resumed, surfaceReady, preview, configured, menu, probe, focusHeld, fullHeld;
-    private boolean completionListener, captureStatusListener;
+    private boolean completionListener, captureStatusListener, exposureRefreshPending;
     private int ratio, menuRow, imageW=6000, imageH=4000;
     private String format="rawjpeg", status="Opening camera", exposure="Exposure pending", focus="";
-    private String displayName="Unknown display", originalFormat, originalAspect, originalSize, originalDrive;
+    private String displayName="Unknown display", originalFormat, originalAspect, originalSize, originalDrive, originalApsc;
     private String shootingRatio;
     private boolean useSonyRect;
     private double pixelAspect=1.0;
@@ -60,7 +60,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         note("Build 0.1.0; model="+Build.MODEL+" device="+Build.DEVICE+" SDK="+Build.VERSION.SDK_INT+" Android="+Build.VERSION.RELEASE);
     }
     @Override protected void onResume() {
-        super.onResume(); resumed=true; gate.open();
+        super.onResume(); resumed=true; gate.open();shootingRatio=null;exposureRefreshPending=false;
         note("resume session="+gate.token());
         Intent info=new Intent("com.android.server.DAConnectionManagerService.AppInfoReceive");
         info.putExtra("package_name",getPackageName());info.putExtra("class_name",getComponentName().getClassName());sendBroadcast(info);
@@ -68,6 +68,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         openCamera();
     }
     private void openCamera() {
+        originalFormat=null;originalAspect=null;originalSize=null;originalDrive=null;originalApsc=null;
         try {
             sony=new Sony();
             Object m=sony.modifier(sony.camera.getParameters());
@@ -75,6 +76,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             originalAspect=String.valueOf(Sony.call(m,"getImageAspectRatio"));
             originalSize=String.valueOf(Sony.call(m,"getImageSize"));
             originalDrive=String.valueOf(Sony.call(m,"getDriveMode"));
+            if(Boolean.TRUE.equals(Sony.call(m,"isApscModeSupported")))originalApsc=String.valueOf(Sony.call(m,"getApscMode"));
             note("initial parameters="+sony.camera.getParameters().flatten());
             configure();
             registerCallbacks();
@@ -97,7 +99,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             configured=true;status="Ready · "+format.toUpperCase(Locale.US);
             note("configured "+format+" "+imageW+"x"+imageH+" preview="+sony.camera.getParameters().get("preview-size"));
             updateExposure();updateDisplay();
-        } catch(Exception e) { fail("Capture disabled: centre > output / retry",e); }
+        } catch(Exception e) { fail("Capture disabled: "+e.getMessage(),e); }
     }
     private void registerCallbacks() {
         final int token=gate.token();
@@ -140,12 +142,22 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
                     if(!gate.current(token))return;
                     String detail=codes(args);
                     try { Object i=args[1];detail+=" "+i.getClass().getField("DirectoryName").get(i)+"/"+i.getClass().getField("FileName").get(i); } catch(Exception ignored) {}
-                    note("store callback "+detail+" composition="+shootingRatio);
+                    note("store callback "+detail+"; ratio/file association unverified");
                 }});
             }});
         } catch(Exception e) { note("store callback unavailable (optional): "+e); }
         if(!completionListener) { configured=false;status="Capture disabled: completion API unavailable"; }
+        String[][] exposureCallbacks={{"setApertureChangeListener","ApertureChangeListener"},
+            {"setShutterSpeedChangeListener","ShutterSpeedChangeListener"},{"setAutoISOSensitivityListener","AutoISOSensitivityListener"}};
+        for(String[] callback:exposureCallbacks)try {
+            sony.listen(callback[0],callback[1],new Sony.Event(){public void receive(String method,Object[] args) {
+                handler.post(new Runnable(){public void run(){if(gate.current(token)) {
+                    if(!exposureRefreshPending){exposureRefreshPending=true;handler.postDelayed(exposureRefresh,100);}
+                }}});
+            }});
+        }catch(Exception e){note("optional exposure callback unavailable: "+e);}
     }
+    private final Runnable exposureRefresh=new Runnable(){public void run(){exposureRefreshPending=false;updateExposure();}};
     private void captureEnded(int token,String message) {
         if(!gate.end(token))return;
         handler.removeCallbacks(captureWatchdog);
@@ -176,12 +188,12 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private void closeCamera(boolean restore) {
         Sony old=sony;sony=null;preview=false;configured=false;
         if(old==null)return;
-        // Restore only the four output settings changed here. Never write backup/protected settings.
+        // Restore only the output settings changed here. Never write backup/protected settings.
         try {
             if(!restore)throw new IllegalStateException("Capture pending: skip output restoration");
             Camera.Parameters p=old.camera.getParameters();Object m=old.modifier(p);
-            String[] setters={"setPictureStorageFormat","setImageAspectRatio","setImageSize","setDriveMode"};
-            String[] values={originalFormat,originalAspect,originalSize,originalDrive};
+            String[] setters={"setPictureStorageFormat","setImageAspectRatio","setImageSize","setDriveMode","setApscMode"};
+            String[] values={originalFormat,originalAspect,originalSize,originalDrive,originalApsc};
             for(int i=0;i<setters.length;i++)if(values[i]!=null)Sony.call(m,setters[i],new Class<?>[]{String.class},values[i]);
             old.camera.setParameters(p);
         } catch(Exception e) { note("output restoration failed: "+e); }
@@ -196,6 +208,13 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
                 handler.post(new Runnable(){public void run(){if(gate.current(token)){note("display event");updateDisplay();}}});
             }});
             Sony.call(displayManager,"setDisplayStatusListener",new Class<?>[]{type},displayListener);
+            try {
+                Class<?> layoutType=Class.forName(Sony.DM+"$VideoLayoutStatusListener");
+                layoutListener=Sony.proxy(layoutType,new Sony.Event(){public void receive(String m,Object[] args){
+                    handler.post(new Runnable(){public void run(){if(gate.current(token))updateDisplay();}});
+                }});
+                Sony.call(displayManager,"setLayoutStatusListener",new Class<?>[]{layoutType},layoutListener);
+            }catch(Exception e){note("video layout listener unavailable: "+e);}
         } catch(Exception e) { note("display manager unavailable: "+e); }
         try {
             Class<?> t=Class.forName("com.sony.scalar.sysutil.didep.Gpelibrary$GS_FRAMEBUFFER_TYPE");
@@ -204,10 +223,11 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     }
     private void closeDisplay() {
         if(displayManager!=null) {
+            try{Sony.call(displayManager,"releaseLayoutStatusListener");}catch(Exception e){note("layout listener release: "+e);}
             try{Sony.call(displayManager,"releaseDisplayStatusListener");}catch(Exception e){note("display listener release: "+e);}
             try{Sony.call(displayManager,"finish");}catch(Exception e){note("display finish: "+e);}
         }
-        displayManager=null;displayListener=null;
+        displayManager=null;displayListener=null;layoutListener=null;
     }
     private void updateDisplay() {
         int w=root.getWidth(),h=root.getHeight();if(w<=0||h<=0)return;

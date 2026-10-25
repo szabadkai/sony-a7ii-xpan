@@ -33,3 +33,9 @@ If the live view appears in EVF but UI does not: first compare RGBA4444 graphics
 The black bars change composition only. The camera stores full frames. Desktop crop utility uses actual oriented image dimensions and the same integer rounding rule as the mask. At 6000×4000, 65:24 gives 6000×2215 (13.29 MP), y=892. Exact 65:24 with integer pixels would require giving up width; this app keeps full width and rounds height to nearest pixel.
 
 Native extra panoramic JPEG is deferred: CameraEx JpegListener and MediaManager expose candidate paths, but lifetime, file allocation and native indexing need investigation. A full 24 MP ARGB bitmap alone costs about 96 MB, unsuitable as an assumed safe path on this legacy camera. Desktop export leaves RAW untouched and preserves practical JPEG EXIF/ICC metadata.
+
+## Additional implementation evidence
+
+[TimeLapse](https://github.com/jonasjuffinger/TimeLapse), MIT, was subsequently inspected for legacy capture notifications. Its ShootActivity uses CameraEx.ShutterListener to advance single-shot capture handling, and the same RGBA4444 preview depth. This supports a fallback when V6 CaptureStatus/StoreImage callbacks are absent; callback timing on ILCE-7M2 still needs observation. Its revision and license are retained. `python3 scripts/fetch-research.py` restores all exact inspected checkouts without executing them.
+
+The finished prototype also records/restores APS-C mode and selects off when supported, to avoid knowingly composing a full-frame crop over an APS-C capture. Query order for the stub-only getImagePixelSize(String,String) declaration is not documented; the adapter uses standard getPictureSize first, then read-only probes of both size/aspect orders, accepting only 6000×4000. A returned parameter value is not substituted for an actual RAW validation.
