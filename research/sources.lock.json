@@ -1,0 +1,18 @@
+{
+  "OpenMemories-Framework": {
+    "url": "https://github.com/ma1co/OpenMemories-Framework",
+    "commit": "f8df3504d8684433a331ee869e64f67cc8be9730"
+  },
+  "recipe-lab": {
+    "url": "https://github.com/voxivoid/recipe-lab-sony-pmca",
+    "commit": "aab4b5703a2b77362b83682801c8e50145ddc6ee"
+  },
+  "PMCADemo": {
+    "url": "https://github.com/ma1co/PMCADemo",
+    "commit": "12f34e49d48a1d9496ea3c2792911867ea4c985b"
+  },
+  "Sony-PMCA-RE": {
+    "url": "https://github.com/ma1co/Sony-PMCA-RE",
+    "commit": "a82f5baaa8e9c3d9f28f94699e860fb2e48cc8e0"
+  }
+}
