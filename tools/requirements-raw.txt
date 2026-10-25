@@ -1,0 +1,3 @@
+# Optional desktop RAW DNG workflow (Python 3.12+); separate from the camera build.
+tifffile==2026.10.15
+numpy==2.5.4

@@ -1,6 +1,6 @@
 # Shooting with XPan Mode
 
-This prototype is intended for the **A7 II / ILCE-7M2**. Native preview, autofocus, exposure, capture and EVF behavior are implemented but await camera validation.
+This prototype is intended for the **A7 II / ILCE-7M2**. The owner reports live preview and shutter capture working in 0.2.0. Autofocus/exposure details, mask alignment and EVF behavior still need focused validation.
 
 ## First launch
 
@@ -38,6 +38,10 @@ Alignment defaults to the fitted SurfaceView. **Sony rectangle (experimental)** 
 Settings → Export diagnostics → Centre writes a new uniquely named `XPAN/diagnostics-*.txt` under Android's reported external-storage directory. Its actual mapping to the removable card is device-dependent and unverified. The path appears in status (long paths may be shortened to fit the screen). Private app storage also retains `diagnostics.txt`, with logcat tag `XPan`; ADB retrieval is optional only if the owner already has authorized debugging configured. This project does not enable ADB, network services or system patches.
 
 Restart camera releases/reopens the camera and renegotiates the settings. It is disabled while a capture is pending. If a callback is missing, the app waits and shows a timeout message rather than repeatedly triggering the shutter.
+
+## Panoramic RAW files
+
+Use the [RAW DNG companion](RAW_WORKFLOW.md) to make a new RAW file that opens with the selected panoramic crop, preserving the full sensor mosaic and the original ARW. This is a desktop conversion after import; the app does not record cropped ARWs on the card.
 
 ## Crop the full-frame image later
 

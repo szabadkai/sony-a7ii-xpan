@@ -1,11 +1,11 @@
 # XPan Mode for Sony A7 II
 
-A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: 0.2.0 builds and passes host checks. Versions 0.1.0 and 0.2.0 were installed on ILCE-7M2 firmware 4.01; preview, capture and EVF operation still require physical testing.**
+A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: 0.2.0 builds and passes host checks. Versions 0.1.0 and 0.2.0 were installed on ILCE-7M2 firmware 4.01; the owner confirms live preview and shutter capture. EVF operation and precise framing alignment still require testing.**
 
 - [Prototype release](https://github.com/szabadkai/sony-a7ii-xpan/releases/tag/v0.2.0-prototype) · [Signed APK](dist/XPanMode-0.2.0-prototype.apk) · [SHA-256](dist/XPanMode-0.2.0-prototype.apk.sha256)
 - [Build instructions](docs/BUILD.md)
 - [Install / remove / recover](docs/INSTALL.md)
-- [User guide](docs/USER_GUIDE.md)
+- [User guide](docs/USER_GUIDE.md) · [Panoramic RAW DNG workflow](docs/RAW_WORKFLOW.md)
 - [Hardware test checklist](docs/HARDWARE_TEST.md)
 - [Local validation results](docs/VALIDATION.md)
 - [Research](RESEARCH.md) · [Implementation and limitations](docs/IMPLEMENTATION.md) · [Progress](PROGRESS.md)
@@ -31,8 +31,8 @@ Panoramic composition is easier when the frame is visible while shooting. This p
 | --- | --- |
 | 0.2.0 build, signature and source reproduction | Verified locally |
 | Installation on ILCE-7M2 firmware 4.01 | 0.1.0 and 0.2.0 verified |
-| Live preview and physical shutter operation | Not yet verified |
-| Full-resolution RAW/JPEG files | Not yet verified |
+| Live preview and physical shutter operation | Owner reports working in 0.2.0 |
+| RAW processing | One camera ARW converted to panoramic RAW DNG; pixel checksums match |
 | Accurate LCD/EVF mask and eye-sensor switching | Not yet verified |
 
 Reports are welcome through the [hardware-test issue form](https://github.com/szabadkai/sony-a7ii-xpan/issues/new?template=hardware-test.yml). See [contributing](CONTRIBUTING.md) and the [test checklist](docs/HARDWARE_TEST.md); report observations separately for each display.
@@ -54,6 +54,18 @@ python3 scripts/bootstrap.py
 
 The bootstrap installs a pinned, checksum-verified toolchain under `.toolchain/`, not globally. The APK uses API 10, DEX 035 and v1 signing. No Gradle, NDK, AndroidX or firmware libraries are bundled. A reusable local signing key is created in `.keys/`; keep it for future updates.
 
+## Panoramic RAW output
+
+The desktop companion can create a **6000×2215 default-cropped RAW DNG** from an A7 II ARW. It preserves the full RAW mosaic and embeds the original ARW. One real camera file passed pixel-checksum comparison, original-file recovery and macOS rendering checks.
+
+```sh
+.venv/bin/pip install -r tools/requirements-raw.txt
+python3 scripts/bootstrap-raw.py
+.venv/bin/python tools/raw_panorama.py DSC00001.ARW DSC00001-xpan.dng
+```
+
+This runs after import on the computer; the camera still records full-frame ARWs. The DNG crop does not reduce the stored sensor data. [Setup, compatibility and validation](docs/RAW_WORKFLOW.md).
+
 ## Desktop panorama export
 
 ```sh
@@ -67,6 +79,6 @@ Export operates on a full-frame JPEG or developed TIFF/PNG, never an ARW. It ref
 
 ## Evidence boundary
 
-Host tests verify the crop math, lifecycle capture gate, reflection names against upstream SDK declarations, non-overwrite export and APK structure/signing. They cannot validate Sony firmware behavior. The next step is the owner-run LCD/EVF and capture checklist, beginning with a spare card and the magenta C1 probe. The owner-authorized installation has since succeeded; see [0.2.0 installation evidence](docs/INSTALLATION_RESULT_0.2.0.json).
+Host tests verify the crop math, lifecycle capture gate, reflection names against upstream SDK declarations, non-overwrite export and APK structure/signing. Host tests cannot validate Sony firmware behavior. The owner subsequently confirmed preview and shutter capture; the RAW companion was also tested on an actual file retrieved from the camera. The next step is the owner-run LCD/EVF and capture checklist, beginning with a spare card and the magenta C1 probe. The owner-authorized installation has since succeeded; see [0.2.0 installation evidence](docs/INSTALLATION_RESULT_0.2.0.json).
 
 MIT license; third-party notices are in `third_party/`.

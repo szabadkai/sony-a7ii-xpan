@@ -1,5 +1,9 @@
 # Local validation — 2026-10-25
 
+## Panoramic RAW and owner feedback
+
+The owner subsequently confirmed 0.2.0 live preview and shutter capture work. A real ARW retrieved from the connected camera was converted into a 6000×2215 default-cropped CFA RAW DNG with identical decoded pixel checksums and a recoverable byte-identical embedded original. macOS ImageIO honored the panoramic crop. See [RAW_WORKFLOW.md](RAW_WORKFLOW.md) for exact scope and remaining limits. All ten Python tests and 125,022 Java checks passed. No new APK was installed for this desktop workflow.
+
 ## 0.2.0-prototype interface update
 
 **Host validation and owner-authorized 0.2.0 installation passed.** PMCA-RE completed the update and returned `org.xpan.camera` version `0.2.0-prototype` in the ILCE-7M2 firmware 4.01 application inventory. Sanitized evidence: [INSTALLATION_RESULT_0.2.0.json](INSTALLATION_RESULT_0.2.0.json). Launch, preview, capture and EVF behavior remain untested. The historical installation report below is specific to 0.1.0.

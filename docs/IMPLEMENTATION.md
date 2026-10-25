@@ -7,7 +7,8 @@
 - `UiRenderer.java`: shared mask/HUD/settings drawing with measured text wrapping and truncation, warm high-contrast colors and clean view. Android Canvas is the production adapter; Java2D is only a host layout preview tool.
 - `Geometry.java`: integer sensor crop and mapping into a fitted live-image rectangle, with physical display pixel aspect correction.
 - `CaptureGate.java`: single capture at a time, generation numbers that reject callbacks from an old camera session.
-- `tools/crop.py`: separate desktop export; never reads/writes ARW or installs anything.
+- `tools/crop.py`: separate desktop rendered-image export; never reads/writes ARW or installs anything.
+- `tools/raw_panorama.py`: desktop ARW-to-RAW-DNG conversion using external DNGLab, followed by verified default-crop metadata editing. Full sensor data and the original ARW are retained; details in RAW_WORKFLOW.md.
 
 ## Geometry contract
 
@@ -35,7 +36,7 @@ UI has no touchscreen dependency. Five aspect ratios and output preferences pers
 
 ## Known limits
 
-1. Versions 0.1.0 and 0.2.0 installation are verified on ILCE-7M2 firmware 4.01. Launch, preview, capture, EVF overlays, eye sensor and release remain unverified.
+1. Versions 0.1.0 and 0.2.0 installation are verified on ILCE-7M2 firmware 4.01. The owner reports launch, preview and shutter capture working in 0.2.0. EVF overlays, eye sensor, mask alignment and release behavior still need focused tests.
 2. No firmware-wide compatibility claim. Third-party A7 II reports do not identify every firmware/API revision.
 3. Native extra cropped JPEG is investigated but not implemented; desktop export is the safe first phase.
 4. No automatic per-file ratio metadata association. Diagnostic capture intentions are not authoritative file metadata.

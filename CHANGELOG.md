@@ -1,5 +1,12 @@
 # Changelog
 
+## Desktop RAW companion
+
+- Create a new panoramic CFA RAW DNG from an A7 II ARW or fresh full-frame DNG.
+- Retain all sensor pixels, embed the original ARW and verify decoded pixel checksums.
+- Preserve source files; refuse conflicting crops and existing outputs.
+- Tested one real camera ARW and macOS panoramic rendering. Camera APK remains 0.2.0.
+
 ## 0.2.0-prototype
 
 - Panoramic launcher icon in six density variants, with editable SVG source.

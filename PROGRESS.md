@@ -49,3 +49,11 @@
 - Shared drawing logic with a host Java2D preview tool; generated 32 layouts across four viewport sizes. These are layout checks, not camera screenshots.
 - Built versionCode 2 with the retained signing key; legacy API 10, DEX 035 and v1 signing checks passed. Existing Java and Python suites passed.
 - Owner-authorized 0.2.0 update succeeded via the same MTP/libusb route. The camera returned version 0.2.0-prototype in its application inventory; sanitized evidence is in docs/INSTALLATION_RESULT_0.2.0.json. Launch, preview, capture and EVF tests remain pending.
+
+## Panoramic RAW follow-up
+
+- Owner confirms 0.2.0 live preview and normal shutter capture work. This supersedes earlier NOT RUN entries for those two observations; EVF and precise framing remain unconfirmed.
+- Added an optional desktop RAW DNG workflow, keeping original ARWs and verifying unchanged decoded RAW pixels. Native arbitrary-aspect ARW capture is not established.
+- Tested one ARW read from the connected ILCE-7M2: 6000×2215 default crop, unchanged RAW pixel checksum, matching encoded RAW segments and byte-identical recovery of the embedded original. macOS ImageIO renders the panoramic crop correctly.
+- Added four RAW workflow tests; all ten Python tests and 125,022 Java checks pass. Personal sample files are excluded from Git.
+- Camera APK remains 0.2.0. The new conversion runs on the computer after import; in-camera JPEG export is still unfinished.
