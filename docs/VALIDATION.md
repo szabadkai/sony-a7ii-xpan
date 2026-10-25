@@ -2,7 +2,7 @@
 
 ## 0.2.0-prototype interface update
 
-**Host validation passed; this version has not been installed or run on the camera.** The installation result below is specific to 0.1.0.
+**Host validation and owner-authorized 0.2.0 installation passed.** PMCA-RE completed the update and returned `org.xpan.camera` version `0.2.0-prototype` in the ILCE-7M2 firmware 4.01 application inventory. Sanitized evidence: [INSTALLATION_RESULT_0.2.0.json](INSTALLATION_RESULT_0.2.0.json). Launch, preview, capture and EVF behavior remain untested. The historical installation report below is specific to 0.1.0.
 
 - Package `org.xpan.camera`, versionCode 2, min/target API 10.
 - DEX 035, 37 application classes, no packaged Sony implementations or native libraries.

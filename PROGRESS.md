@@ -48,4 +48,4 @@
 - Added persisted clean view on UP; error and capture-in-progress messages stay visible.
 - Shared drawing logic with a host Java2D preview tool; generated 32 layouts across four viewport sizes. These are layout checks, not camera screenshots.
 - Built versionCode 2 with the retained signing key; legacy API 10, DEX 035 and v1 signing checks passed. Existing Java and Python suites passed.
-- 0.2.0 has not been installed or run on the camera. Earlier installation evidence remains specific to 0.1.0.
+- Owner-authorized 0.2.0 update succeeded via the same MTP/libusb route. The camera returned version 0.2.0-prototype in its application inventory; sanitized evidence is in docs/INSTALLATION_RESULT_0.2.0.json. Launch, preview, capture and EVF tests remain pending.

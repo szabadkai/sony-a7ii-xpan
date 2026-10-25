@@ -1,6 +1,6 @@
 # XPan Mode for Sony A7 II
 
-A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: 0.2.0 builds and passes host checks. Version 0.1.0 was installed on ILCE-7M2 firmware 4.01; preview, capture and EVF operation still require physical testing.**
+A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: 0.2.0 builds and passes host checks. Versions 0.1.0 and 0.2.0 were installed on ILCE-7M2 firmware 4.01; preview, capture and EVF operation still require physical testing.**
 
 - [Prototype release](https://github.com/szabadkai/sony-a7ii-xpan/releases/tag/v0.2.0-prototype) · [Signed APK](dist/XPanMode-0.2.0-prototype.apk) · [SHA-256](dist/XPanMode-0.2.0-prototype.apk.sha256)
 - [Build instructions](docs/BUILD.md)
@@ -30,7 +30,7 @@ Panoramic composition is easier when the frame is visible while shooting. This p
 | Check | Result |
 | --- | --- |
 | 0.2.0 build, signature and source reproduction | Verified locally |
-| Installation on ILCE-7M2 firmware 4.01 | 0.1.0 verified; 0.2.0 pending |
+| Installation on ILCE-7M2 firmware 4.01 | 0.1.0 and 0.2.0 verified |
 | Live preview and physical shutter operation | Not yet verified |
 | Full-resolution RAW/JPEG files | Not yet verified |
 | Accurate LCD/EVF mask and eye-sensor switching | Not yet verified |
@@ -67,6 +67,6 @@ Export operates on a full-frame JPEG or developed TIFF/PNG, never an ARW. It ref
 
 ## Evidence boundary
 
-Host tests verify the crop math, lifecycle capture gate, reflection names against upstream SDK declarations, non-overwrite export and APK structure/signing. They cannot validate Sony firmware behavior. The next step is the owner-run LCD/EVF and capture checklist, beginning with a spare card and the magenta C1 probe. The owner-authorized installation has since succeeded; see docs/INSTALLATION_RESULT.json.
+Host tests verify the crop math, lifecycle capture gate, reflection names against upstream SDK declarations, non-overwrite export and APK structure/signing. They cannot validate Sony firmware behavior. The next step is the owner-run LCD/EVF and capture checklist, beginning with a spare card and the magenta C1 probe. The owner-authorized installation has since succeeded; see [0.2.0 installation evidence](docs/INSTALLATION_RESULT_0.2.0.json).
 
 MIT license; third-party notices are in `third_party/`.

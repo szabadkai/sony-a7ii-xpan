@@ -35,7 +35,7 @@ UI has no touchscreen dependency. Five aspect ratios and output preferences pers
 
 ## Known limits
 
-1. Version 0.1.0 installation is verified on ILCE-7M2 firmware 4.01; 0.2.0 installation is pending. Launch, preview, capture, EVF overlays, eye sensor and release remain unverified.
+1. Versions 0.1.0 and 0.2.0 installation are verified on ILCE-7M2 firmware 4.01. Launch, preview, capture, EVF overlays, eye sensor and release remain unverified.
 2. No firmware-wide compatibility claim. Third-party A7 II reports do not identify every firmware/API revision.
 3. Native extra cropped JPEG is investigated but not implemented; desktop export is the safe first phase.
 4. No automatic per-file ratio metadata association. Diagnostic capture intentions are not authoritative file metadata.
