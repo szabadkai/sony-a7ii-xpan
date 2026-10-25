@@ -17,6 +17,7 @@ The 65:24 mask is on by default. Full sensor frames are still recorded. The 3:2 
 | Fn | Cycle the five aspect ratios |
 | Left / right | Previous / next aspect ratio |
 | Centre | Open/close settings; activate export/retry rows |
+| Up in shooting view | Toggle clean view (hide exposure, ratio and hints); choice persists |
 | Up / down in settings | Select row |
 | Left / right in settings | Change ratio, RAW+JPEG/JPEG output, or alignment mode |
 | C1 | Toggle diagnostic magenta rectangle, image boundary and display label |
@@ -30,13 +31,13 @@ Exposure values are read from Sony parameters and refreshed on optional callback
 
 ## Settings and diagnostics
 
-Ratio and output choices persist. **JPEG** is an explicit option and does not retain RAW; leave **RAWJPEG** selected for the intended non-destructive workflow. The app never selects RAW-only because another PMCA camera has a documented capture problem with that combination.
+Ratio, output, alignment and clean-view choices persist. Clean view keeps the black framing mask; capture progress and error messages remain visible. Press UP again to restore the shooting information. **JPEG** is an explicit option and does not retain RAW; leave **RAW + JPEG** selected for the intended non-destructive workflow. The app never selects RAW-only because another PMCA camera has a documented capture problem with that combination.
 
 Alignment defaults to the fitted SurfaceView. **Sony rectangle (experimental)** maps the reported video bounds from device pixels into the Android view. The API's coordinate convention is unverified; compare against the test chart before trusting this option. If no valid rectangle is reported, it falls back to the surface geometry. A difference between the green image boundary and visible live-image edges is a failed alignment test, not something to ignore.
 
-Settings → Export diagnostic report → Centre writes a new uniquely named `XPAN/diagnostics-*.txt` under Android's reported external-storage directory. Its actual mapping to the removable card is device-dependent and unverified. The full path appears in status. Private app storage also retains `diagnostics.txt`, with logcat tag `XPan`; ADB retrieval is optional only if the owner already has authorized debugging configured. This project does not enable ADB, network services or system patches.
+Settings → Export diagnostics → Centre writes a new uniquely named `XPAN/diagnostics-*.txt` under Android's reported external-storage directory. Its actual mapping to the removable card is device-dependent and unverified. The path appears in status (long paths may be shortened to fit the screen). Private app storage also retains `diagnostics.txt`, with logcat tag `XPan`; ADB retrieval is optional only if the owner already has authorized debugging configured. This project does not enable ADB, network services or system patches.
 
-Retry releases/reopens the camera and renegotiates the settings. It is disabled while a capture is pending. If a callback is missing, the app waits and shows a timeout message rather than repeatedly triggering the shutter.
+Restart camera releases/reopens the camera and renegotiates the settings. It is disabled while a capture is pending. If a callback is missing, the app waits and shows a timeout message rather than repeatedly triggering the shutter.
 
 ## Crop the full-frame image later
 

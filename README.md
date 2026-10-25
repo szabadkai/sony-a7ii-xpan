@@ -1,14 +1,25 @@
 # XPan Mode for Sony A7 II
 
-A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: APK/build and installation on ILCE-7M2 firmware 4.01 verified; preview, capture and EVF operation still require physical testing.**
+A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black panoramic live-view mask and native camera capture. **Prototype: 0.2.0 builds and passes host checks. Version 0.1.0 was installed on ILCE-7M2 firmware 4.01; preview, capture and EVF operation still require physical testing.**
 
-- [Prototype release](https://github.com/szabadkai/sony-a7ii-xpan/releases/tag/v0.1.0-prototype) · [Signed APK](dist/XPanMode-0.1.0.apk) · [SHA-256](dist/XPanMode-0.1.0.apk.sha256)
+- [Prototype release](https://github.com/szabadkai/sony-a7ii-xpan/releases/tag/v0.2.0-prototype) · [Signed APK](dist/XPanMode-0.2.0-prototype.apk) · [SHA-256](dist/XPanMode-0.2.0-prototype.apk.sha256)
 - [Build instructions](docs/BUILD.md)
 - [Install / remove / recover](docs/INSTALL.md)
 - [User guide](docs/USER_GUIDE.md)
 - [Hardware test checklist](docs/HARDWARE_TEST.md)
 - [Local validation results](docs/VALIDATION.md)
 - [Research](RESEARCH.md) · [Implementation and limitations](docs/IMPLEMENTATION.md) · [Progress](PROGRESS.md)
+
+## Interface
+
+![XPan Mode launcher icon](docs/images/icon.png)
+
+Version 0.2.0 adds a panoramic launcher icon, ivory/amber interface, clearer settings selection and help, a RAW/JPEG badge, and an optional clean shooting view (press **UP**). Errors and capture progress remain visible in clean view.
+
+![Shooting layout](docs/images/shooting-preview.png)
+![Settings layout](docs/images/settings-preview.png)
+
+These are **host-rendered layouts on a synthetic grid**, generated from the app’s drawing code. They are not camera screenshots or evidence of LCD/EVF operation. Android font rendering may differ.
 
 ## Why this exists
 
@@ -18,8 +29,8 @@ Panoramic composition is easier when the frame is visible while shooting. This p
 
 | Check | Result |
 | --- | --- |
-| Build, signature and clean-source reproduction | Verified |
-| Installation on ILCE-7M2 firmware 4.01 | Verified |
+| 0.2.0 build, signature and source reproduction | Verified locally |
+| Installation on ILCE-7M2 firmware 4.01 | 0.1.0 verified; 0.2.0 pending |
 | Live preview and physical shutter operation | Not yet verified |
 | Full-resolution RAW/JPEG files | Not yet verified |
 | Accurate LCD/EVF mask and eye-sensor switching | Not yet verified |

@@ -28,10 +28,10 @@ python3 scripts/bootstrap.py
 
 Downloads go to `.toolchain/downloads`; every archive is verified against SHA-256 in `scripts/toolchain.lock.json` before extraction. No global package changes. Android SDK terms apply to Google's downloaded SDK tools. The bootstrap checks that aapt can execute. Its historical extraction folder `android-11` actually contains build-tools **30.0.3**; API 10 comes from `android-2.3.3_r02-linux` on both hosts.
 
-Outputs:
+Output names follow `versionName` in the manifest. Current outputs:
 
-- `dist/XPanMode-0.1.0.apk` — signed installable-format prototype.
-- `dist/XPanMode-0.1.0.apk.sha256` — digest.
+- `dist/XPanMode-0.2.0-prototype.apk` — signed installable-format prototype.
+- `dist/XPanMode-0.2.0-prototype.apk.sha256` — digest.
 - `build/unsigned.apk` — reproducible aligned unsigned payload.
 - `build/badging.txt` — package, permissions, SDK and launcher inspection.
 - `build/signature.txt` — verification and certificate fingerprint.
@@ -66,3 +66,9 @@ Tests cover fixed and randomized crop geometry, nonsquare display pixels, letter
 ## Investigated build failures
 
 The initial historical build-tools URL returned 404; Google's repository metadata gives a hash-prefixed macOS URL, now pinned. D8 30.0.3 does not strip quotation marks in its response-file paths; the build now writes relative unquoted paths for D8 and uses a source root with no spaces in relative filenames. This was verified from a workspace whose absolute path contains spaces. javac response files retain their own required quoting.
+
+## Interface assets and layout previews
+
+The launcher icon source is `assets/icon.svg`; six density-specific PNGs are checked in under `app/res/`. Normal builds need no image tooling. To regenerate them, install librsvg and run `python3 scripts/render-icon.py`.
+
+Run `./scripts/preview-ui.sh` for 32 host previews in `build/ui-preview/`, covering four viewport sizes and shooting, settings, clean, error, full-frame, probe, JPEG and fallback states. This uses the production `UiRenderer` through a Java2D adapter; it does not simulate camera behavior or establish Android font/EVF rendering. The adapter is not compiled into the APK.

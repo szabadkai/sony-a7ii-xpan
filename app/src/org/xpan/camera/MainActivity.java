@@ -31,7 +31,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
     private String format="rawjpeg", status="Opening camera", exposure="Exposure pending", focus="";
     private String displayName="Unknown display", originalFormat, originalAspect, originalSize, originalDrive, originalApsc;
     private String shootingRatio;
-    private boolean useSonyRect;
+    private boolean useSonyRect, cleanView, statusAlert;
     private double pixelAspect=1.0;
     private Geometry.Box imageBox=new Geometry.Box(0,0,0,0), sonyBox;
 
@@ -43,6 +43,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         ratio=Math.max(0,Math.min(4,prefs.getInt("ratio",0)));
         format=prefs.getBoolean("jpeg",false)?"jpeg":"rawjpeg";
         useSonyRect=prefs.getBoolean("sonyRect",false);
+        cleanView=prefs.getBoolean("cleanView",false);
         root=new FrameLayout(this) {
             @Override protected void onSizeChanged(int w,int h,int ow,int oh) {
                 super.onSizeChanged(w,h,ow,oh);
@@ -57,7 +58,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         overlay=new Overlay();
         root.addView(overlay,new FrameLayout.LayoutParams(-1,-1));
         setContentView(root);
-        note("Build 0.1.0; model="+Build.MODEL+" device="+Build.DEVICE+" SDK="+Build.VERSION.SDK_INT+" Android="+Build.VERSION.RELEASE);
+        note("Build 0.2.0; model="+Build.MODEL+" device="+Build.DEVICE+" SDK="+Build.VERSION.SDK_INT+" Android="+Build.VERSION.RELEASE);
     }
     @Override protected void onResume() {
         super.onResume(); resumed=true; gate.open();shootingRatio=null;exposureRefreshPending=false;
@@ -96,7 +97,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             if(size==null||size.width!=6000||size.height!=4000)
                 throw new IllegalStateException("Expected ILCE-7M2 full frame 6000x4000; got "+(size==null?"null":size.width+"x"+size.height));
             imageW=size.width; imageH=size.height;
-            configured=true;status="Ready · "+format.toUpperCase(Locale.US);
+            configured=true;statusAlert=false;status="Ready · "+format.toUpperCase(Locale.US);
             note("configured "+format+" "+imageW+"x"+imageH+" preview="+sony.camera.getParameters().get("preview-size"));
             updateExposure();updateDisplay();
         } catch(Exception e) { fail("Capture disabled: "+e.getMessage(),e); }
@@ -162,7 +163,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         if(!gate.end(token))return;
         handler.removeCallbacks(captureWatchdog);
         if(!focusHeld && sony!=null)try{sony.camera.cancelAutoFocus();}catch(RuntimeException e){note("AF release: "+e);}
-        status=message;focus="";preview=false;startPreview();updateExposure();overlay.invalidate();
+        status=message;statusAlert=false;focus="";preview=false;startPreview();updateExposure();overlay.invalidate();
     }
     private static String codes(Object[] args) {
         StringBuilder b=new StringBuilder();for(Object a:args)if(a instanceof Number)b.append(a).append(' ');return b.toString();
@@ -288,7 +289,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         if(!configured||!preview||sony==null||!gate.begin())return;
         menu=false;shootingRatio=Geometry.LABELS[ratio];
         note("shutter composition="+shootingRatio+" crop="+Geometry.crop(imageW,imageH,Geometry.RATIOS[ratio][0],Geometry.RATIOS[ratio][1]));
-        savePrivateLog();status="Capturing";
+        savePrivateLog();statusAlert=false;status="Capturing";
         try {sony.camera.takePicture(null,null,null);handler.postDelayed(captureWatchdog,60000);}
         catch(RuntimeException e){gate.end(gate.token());fail("Capture refused",e);}
         overlay.invalidate();
@@ -321,6 +322,7 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             }
             overlay.invalidate();return true;
         }
+        if(scan==103||key==KeyEvent.KEYCODE_DPAD_UP){cleanView=!cleanView;persist();overlay.invalidate();return true;}
         if(step!=0){ratio=(ratio+step+5)%5;persist();overlay.invalidate();return true;}
         if(scan==525||scan==526||scan==528||scan==529) {
             try {if(sony!=null) {Sony.call(sony.ex,(scan==525?"incrementAperture":scan==526?"decrementAperture":scan==528?"incrementShutterSpeed":"decrementShutterSpeed"));updateExposure();}}
@@ -340,8 +342,8 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
         if(gate.busy())return;
         closeCamera();gate.close();gate.open();closeDisplay();openDisplay();openCamera();menu=false;
     }
-    private void persist(){prefs.edit().putInt("ratio",ratio).putBoolean("jpeg","jpeg".equals(format)).putBoolean("sonyRect",useSonyRect).commit();}
-    private void fail(String message,Throwable e){status=message;note(message+(e==null?"":": "+e));if(overlay!=null)overlay.invalidate();}
+    private void persist(){prefs.edit().putInt("ratio",ratio).putBoolean("jpeg","jpeg".equals(format)).putBoolean("sonyRect",useSonyRect).putBoolean("cleanView",cleanView).commit();}
+    private void fail(String message,Throwable e){statusAlert=true;status=message;note(message+(e==null?"":": "+e));if(overlay!=null)overlay.invalidate();}
     private void note(String message){Log.i("XPan",message);log.append(System.currentTimeMillis()).append(' ').append(message).append('\n');if(log.length()>60000)log.delete(0,log.length()-48000);}
     private void savePrivateLog(){try{FileOutputStream out=openFileOutput("diagnostics.txt",MODE_PRIVATE);out.write(log.toString().getBytes("UTF-8"));out.close();}catch(IOException e){Log.e("XPan","save log",e);}}
     private void exportLog(){
@@ -350,38 +352,38 @@ public final class MainActivity extends Activity implements SurfaceHolder.Callba
             if(!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))throw new IOException("No writable external storage");
             File dir=new File(Environment.getExternalStorageDirectory(),"XPAN");if(!dir.isDirectory()&&!dir.mkdirs())throw new IOException("Cannot create XPAN folder");
             File file=File.createTempFile("diagnostics-",".txt",dir);
-            FileOutputStream out=new FileOutputStream(file);out.write(log.toString().getBytes("UTF-8"));out.close();status="Report: "+file.getAbsolutePath();
+            FileOutputStream out=new FileOutputStream(file);out.write(log.toString().getBytes("UTF-8"));out.close();statusAlert=false;status="Report: "+file.getAbsolutePath();
         }catch(IOException e){fail("Report kept in private app storage",e);}overlay.invalidate();
     }
-    private final class Overlay extends View {
+    private final class Overlay extends View implements UiRenderer.Drawing {
         private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final RectF rounded=new RectF();
+        private final UiRenderer renderer=new UiRenderer();
+        private final UiRenderer.State state=new UiRenderer.State();
+        private Canvas canvas;
         Overlay(){super(MainActivity.this);setFocusable(false);}
-        private void text(Canvas c,String value,float x,float y,int color,float size){paint.setColor(color);paint.setTextSize(size);paint.setStyle(Paint.Style.FILL);c.drawText(value,x,y,paint);}
+        private void style(int color){paint.setColor(color);paint.setStyle(Paint.Style.FILL);}
+        public void rect(float l,float t,float r,float b,int color){style(color);canvas.drawRect(l,t,r,b,paint);}
+        public void round(float l,float t,float r,float b,float radius,int color){
+            style(color);rounded.set(l,t,r,b);canvas.drawRoundRect(rounded,radius,radius,paint);
+        }
+        public float measure(String value,float size,boolean bold){
+            paint.setTextSize(size);paint.setTypeface(bold?Typeface.DEFAULT_BOLD:Typeface.DEFAULT);return paint.measureText(value);
+        }
+        public void text(String value,float x,float baseline,float size,int color,boolean bold){
+            measure(value,size,bold);style(color);canvas.drawText(value,x,baseline,paint);
+        }
         @Override protected void onDraw(Canvas c) {
-            float w=getWidth(),h=getHeight();float font=Math.max(13,h/25);
-            Geometry.Box source=useSonyRect&&sonyBox!=null?sonyBox:imageBox;
-            Geometry.Box crop=Geometry.map(Geometry.crop(imageW,imageH,Geometry.RATIOS[ratio][0],Geometry.RATIOS[ratio][1]),imageW,imageH,source);
-            paint.setColor(Color.BLACK);paint.setStyle(Paint.Style.FILL);
-            c.drawRect(0,0,w,(float)crop.top,paint);c.drawRect(0,(float)crop.bottom,w,h,paint);
-            c.drawRect(0,(float)crop.top,(float)crop.left,(float)crop.bottom,paint);c.drawRect((float)crop.right,(float)crop.top,w,(float)crop.bottom,paint);
-            text(c,Geometry.LABELS[ratio]+"   "+focus,12,font+5,Color.WHITE,font);
-            text(c,exposure,12,h-font-12,Color.WHITE,font);
-            text(c,status,12,h-6,configured?0xffbbbbbb:0xffffbb66,font*.8f);
-            if(probe) {
-                paint.setColor(Color.MAGENTA);c.drawRect(w*.1f,h*.43f,w*.3f,h*.57f,paint);
-                text(c,"EVF PROBE",w*.11f,h*.51f,Color.BLACK,font);
-                text(c,displayName+"  "+(useSonyRect?"Sony rect EXPERIMENTAL":"Surface geometry"),12,font*2.4f,Color.YELLOW,font*.8f);
-                paint.setColor(Color.GREEN);paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(2);
-                c.drawRect((float)source.left,(float)source.top,(float)source.right,(float)source.bottom,paint);paint.setStyle(Paint.Style.FILL);
-            }
-            if(menu) {
-                paint.setColor(0xee000000);c.drawRect(0,0,w,h,paint);
-                text(c,"XPAN MODE  /  centre close · MENU back",18,font*1.6f,Color.WHITE,font);
-                String[] rows={"Frame: "+Geometry.LABELS[ratio],"Output: "+format.toUpperCase(Locale.US)+("jpeg".equals(format)?" (no RAW)":""),"Alignment: "+(useSonyRect?"Sony rectangle (experimental)":"Surface (default)"),"Export diagnostic report [centre]","Retry camera [centre]"};
-                for(int i=0;i<rows.length;i++)text(c,(i==menuRow?"> ":"  ")+rows[i],18,font*(3.4f+i*1.7f),i==menuRow?Color.YELLOW:Color.WHITE,font);
-                text(c,"Up/down select · Left/right change · C1 probe · Fn frame",18,h-font*1.8f,Color.LTGRAY,font*.85f);
-                text(c,status,18,h-8,Color.LTGRAY,font*.8f);
-            }
+            canvas=c;
+            state.width=getWidth();state.height=getHeight();state.ratio=ratio;state.menuRow=menuRow;
+            state.configured=configured;state.preview=preview;state.busy=gate.busy();state.alert=statusAlert;
+            state.menu=menu;state.probe=probe;state.clean=cleanView;state.experimental=useSonyRect;
+            state.sonyRectAvailable=sonyBox!=null;state.format=format;state.exposure=exposure;
+            state.status=status;state.focus=focus;state.display=displayName;
+            state.source=useSonyRect&&sonyBox!=null?sonyBox:imageBox;
+            state.crop=Geometry.map(Geometry.crop(imageW,imageH,Geometry.RATIOS[ratio][0],Geometry.RATIOS[ratio][1]),imageW,imageH,state.source);
+            renderer.draw(this,state);
+            canvas=null;
         }
     }
 }

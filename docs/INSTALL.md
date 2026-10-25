@@ -1,15 +1,15 @@
 # Install, remove, recover — ILCE-7M2
 
-This is a normal removable PMCA Android application. Installation has now succeeded on the owner’s ILCE-7M2, firmware 4.01. Preview, capture and EVF behavior still await testing. See INSTALLATION_RESULT.json.
+This is a normal removable PMCA Android application. Version 0.1.0 installation succeeded on the owner’s ILCE-7M2, firmware 4.01. Version 0.2.0 has the same package/signing certificate and a higher version code, but its installation is not yet tested. Preview, capture and EVF behavior still await testing. See INSTALLATION_RESULT.json.
 
 1. Confirm the label is **ILCE-7M2** and that `MENU → Application` exists. Record `MENU → Setup → Version`. Firmware 4.01 is listed by Sony, but do not update firmware just to run this prototype.
 2. Start with a charged battery and a spare/test memory card. Keep existing photographs backed up. Set P mode, a full-frame lens, digital zoom 1x, and short exposure for the first test. Exit other camera apps.
 3. Obtain [Sony-PMCA-RE](https://github.com/ma1co/Sony-PMCA-RE/releases). Use **App Installer**, not Tweaks, updater mode or service mode. No OpenMemories-Tweak installation or protected-setting unlock is required.
 4. Set the camera's USB connection to **Mass Storage**, connect a data-capable USB cable, and close Photos/other software claiming the device.
-5. In pmca-gui's **Install app** tab choose **Select an apk**, click **Open apk...**, select `dist/XPanMode-0.1.0.apk`, then click **Install selected app**. Alternatively, from PMCA-RE's directory:
+5. In pmca-gui's **Install app** tab choose **Select an apk**, click **Open apk...**, select `dist/XPanMode-0.2.0-prototype.apk`, then click **Install selected app**. Alternatively, from PMCA-RE's directory:
 
    ```sh
-   python3 pmca-console.py install -f '/absolute/path/to/XPanMode-0.1.0.apk'
+   python3 pmca-console.py install -f '/absolute/path/to/XPanMode-0.2.0-prototype.apk'
    ```
 
 6. Wait for the normal app installation to finish. Disconnect safely. Open `MENU → Application → Application List → XPan Mode`.

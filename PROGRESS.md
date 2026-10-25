@@ -40,3 +40,12 @@
 - Camera returned model ILCE-7M2, firmware 4.01, and the installed package in its application inventory.
 - Mass Storage access failed on this Mac. Switching to MTP and using libusb with normal macOS administrator authorization succeeded. No driver installation or firmware modification was performed.
 - The inventory reports the Android package version as 4.1.2-323; the earlier Android 2.3.7 statement is the upstream compatibility baseline, not a measurement of this body. Build.VERSION.SDK_INT still needs an app diagnostic.
+
+## Interface polish — 0.2.0-prototype
+
+- Added a project-owned SVG launcher icon and six packaged PNG density variants.
+- Refined shooting information, RAW/JPEG badge, selected settings rows, contextual help, wrapped errors and preview-alignment fallback labeling.
+- Added persisted clean view on UP; error and capture-in-progress messages stay visible.
+- Shared drawing logic with a host Java2D preview tool; generated 32 layouts across four viewport sizes. These are layout checks, not camera screenshots.
+- Built versionCode 2 with the retained signing key; legacy API 10, DEX 035 and v1 signing checks passed. Existing Java and Python suites passed.
+- 0.2.0 has not been installed or run on the camera. Earlier installation evidence remains specific to 0.1.0.

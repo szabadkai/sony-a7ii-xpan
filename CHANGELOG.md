@@ -1,0 +1,17 @@
+# Changelog
+
+## 0.2.0-prototype
+
+- Panoramic launcher icon in six density variants, with editable SVG source.
+- Ivory/amber shooting information, clearer RAW/JPEG badge and settings selection.
+- Contextual settings help and measured, wrapped status/error messages.
+- UP toggles a persisted clean shooting view; errors and capture progress stay visible.
+- Explicit Sony-rectangle fallback label in the diagnostic probe.
+- Shared production drawing code and a host layout-preview script.
+- Versioned APK filenames derived from the manifest; same signing identity as 0.1.0.
+
+Host checks pass. Camera installation and operation for this version remain untested.
+
+## 0.1.0-prototype
+
+Initial native CameraEx preview/capture implementation, five framing ratios, RAW+JPEG negotiation, display diagnostics, desktop crop utility and reproducible legacy Android build. Installed on ILCE-7M2 firmware 4.01; launch, capture and EVF behavior still await physical testing.

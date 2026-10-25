@@ -4,6 +4,7 @@
 
 - `Sony.java`: a small reflective adapter to real CameraEx APIs, parameter capability negotiation, optional listeners and release. Required signature declarations are retained under `third_party/api-reference/`; no Sony implementations are bundled.
 - `MainActivity.java`: SurfaceView, Android Canvas mask, physical controls, parameter snapshot/restore, callbacks, app preferences, bounded diagnostic logs and display listener.
+- `UiRenderer.java`: shared mask/HUD/settings drawing with measured text wrapping and truncation, warm high-contrast colors and clean view. Android Canvas is the production adapter; Java2D is only a host layout preview tool.
 - `Geometry.java`: integer sensor crop and mapping into a fitted live-image rectangle, with physical display pixel aspect correction.
 - `CaptureGate.java`: single capture at a time, generation numbers that reject callbacks from an old camera session.
 - `tools/crop.py`: separate desktop export; never reads/writes ARW or installs anything.
@@ -34,7 +35,7 @@ UI has no touchscreen dependency. Five aspect ratios and output preferences pers
 
 ## Known limits
 
-1. Installation is verified on ILCE-7M2 firmware 4.01. Launch, preview, capture, EVF overlays, eye sensor and release remain unverified.
+1. Version 0.1.0 installation is verified on ILCE-7M2 firmware 4.01; 0.2.0 installation is pending. Launch, preview, capture, EVF overlays, eye sensor and release remain unverified.
 2. No firmware-wide compatibility claim. Third-party A7 II reports do not identify every firmware/API revision.
 3. Native extra cropped JPEG is investigated but not implemented; desktop export is the safe first phase.
 4. No automatic per-file ratio metadata association. Diagnostic capture intentions are not authoritative file metadata.

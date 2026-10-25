@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>XPan Mode panoramic viewfinder</title>
+  <rect x="8" y="8" width="240" height="240" rx="52" fill="#141716"/>
+  <rect x="9" y="9" width="238" height="238" rx="51" fill="none" stroke="#333834" stroke-width="2"/>
+  <rect x="28" y="90" width="200" height="76" rx="8" fill="none" stroke="#f2eedf" stroke-width="10"/>
+  <path d="M34 150 L84 123 L126 148 L157 132 L222 153" fill="none" stroke="#f2eedf" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="184" cy="113" r="10" fill="#eab65b"/>
+  <path d="M104 61 H152" fill="none" stroke="#eab65b" stroke-width="8" stroke-linecap="round"/>
+  <path d="M104 196 H152" fill="none" stroke="#eab65b" stroke-width="8" stroke-linecap="round"/>
+</svg>

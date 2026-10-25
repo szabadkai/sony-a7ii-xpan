@@ -1,5 +1,25 @@
 # Local validation — 2026-10-25
 
+## 0.2.0-prototype interface update
+
+**Host validation passed; this version has not been installed or run on the camera.** The installation result below is specific to 0.1.0.
+
+- Package `org.xpan.camera`, versionCode 2, min/target API 10.
+- DEX 035, 37 application classes, no packaged Sony implementations or native libraries.
+- Six launcher-icon density variants resolve through the application manifest.
+- v1 signature and ZIP alignment verified; certificate SHA-256 matches 0.1.0: `7d1a50a82edca3eb91ddd3b26f9ace48c2bd4ba18a4549300b90e57f71f359b2`.
+- Java core: 125,022 checks passed; all six Python tests passed.
+- Generated 32 host layouts from production drawing code at 320×240, 640×360, 640×480 and 960×720. Visually reviewed shooting, settings, clean-view error, full-frame and diagnostic-fallback examples, including small and widescreen settings layouts. Android fonts and hardware composition remain untested.
+- Copied only `app/` and `scripts/` into a fresh temporary directory, with no compiled classes. Rebuilt using the same pinned toolchain and retained key through explicit paths. Both unsigned and signed APKs matched byte-for-byte.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `dist/XPanMode-0.2.0-prototype.apk` | `1b4d53483abd0b303e254475bed57771a637522e1d7b2724f5c0e7aa0954e95e` |
+| Aligned unsigned APK | `12fc04add27f6859ca40755590c790a88dd94f3367a1f8b5c27a4d0dc285b097` |
+
+## Historical 0.1.0 validation and installation
+
+
 **Result: signed prototype APK built and inspected. Installation has subsequently been confirmed on ILCE-7M2 firmware 4.01; app operation remains unverified.**
 
 ## Artifact

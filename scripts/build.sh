@@ -2,6 +2,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 ROOT="$PWD"
+VERSION="$(python3 - <<'PY_VERSION'
+import xml.etree.ElementTree as ET
+m=ET.parse('app/AndroidManifest.xml').getroot()
+print(m.attrib['{http://schemas.android.com/apk/res/android}versionName'])
+PY_VERSION
+)"
+APK="dist/XPanMode-$VERSION.apk"
+export XPAN_APK_OUTPUT="$APK"
 if [ -z "${JAVA_HOME:-}" ]; then
   if [ -d "$ROOT/.toolchain/jdk-17.0.18+8/Contents/Home" ]; then
     export JAVA_HOME="$ROOT/.toolchain/jdk-17.0.18+8/Contents/Home"
@@ -50,14 +58,14 @@ if [ ! -f "$KS" ]; then
 fi
 "$BT/apksigner" sign --ks "$KS" --ks-key-alias "$ALIAS" --ks-pass env:XPAN_STORE_PASS --key-pass env:XPAN_KEY_PASS \
   --min-sdk-version 10 --v1-signing-enabled true --v2-signing-enabled false --v3-signing-enabled false --v4-signing-enabled false \
-  --out dist/XPanMode-0.1.0.apk build/unsigned.apk
-"$BT/apksigner" verify --verbose --print-certs --min-sdk-version 10 dist/XPanMode-0.1.0.apk > build/signature.txt
-"$BT/aapt" dump badging dist/XPanMode-0.1.0.apk > build/badging.txt
-"$BT/zipalign" -c 4 dist/XPanMode-0.1.0.apk
-python3 scripts/inspect_apk.py dist/XPanMode-0.1.0.apk
+  --out "$APK" build/unsigned.apk
+"$BT/apksigner" verify --verbose --print-certs --min-sdk-version 10 "$APK" > build/signature.txt
+"$BT/aapt" dump badging "$APK" > build/badging.txt
+"$BT/zipalign" -c 4 "$APK"
+python3 scripts/inspect_apk.py "$APK"
 python3 - <<'PY'
-import hashlib,pathlib
-p=pathlib.Path('dist/XPanMode-0.1.0.apk');s=hashlib.sha256(p.read_bytes()).hexdigest()
+import hashlib,pathlib,os
+p=pathlib.Path(os.environ['XPAN_APK_OUTPUT']);s=hashlib.sha256(p.read_bytes()).hexdigest()
 p.with_suffix('.apk.sha256').write_text(s+'  '+p.name+'\n')
 print('Built '+str(p)+' SHA256 '+s)
 PY
