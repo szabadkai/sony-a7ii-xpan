@@ -7,6 +7,7 @@ A small, buildable PlayMemories camera app for **Sony ILCE-7M2**, with a black p
 - [Install / remove / recover](docs/INSTALL.md)
 - [User guide](docs/USER_GUIDE.md)
 - [Hardware test checklist](docs/HARDWARE_TEST.md)
+- [Local validation results](docs/VALIDATION.md)
 - [Research](RESEARCH.md) · [Implementation and limitations](docs/IMPLEMENTATION.md) · [Progress](PROGRESS.md)
 
 ## Implemented

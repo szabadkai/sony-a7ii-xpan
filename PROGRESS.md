@@ -12,9 +12,9 @@
 - Added non-destructive JPEG/TIFF/PNG companion exporter and Linux/macOS bootstrap/build scripts.
 - Wrote installation/recovery, user guide, limitations and owner-run hardware checklist.
 
-## Current validation
+## Final local validation
 
-- Separate clean-source build and byte-reproducibility check are being performed; final result goes in docs/VALIDATION.md.
+- Separate clean-source build passed: unsigned and same-key signed APKs are byte-identical. Evidence and hashes are in docs/VALIDATION.md.
 
 ## Verified source findings
 
@@ -32,4 +32,4 @@
 - Callback timing, automatic preview return, full/missing card errors, pause/resume and normal output restoration.
 - Diagnostic external-storage mapping and optional file callback availability.
 
-**No camera has been connected to or operated by this project; no installation was attempted.** All hardware acceptance rows remain NOT RUN. Native extra panoramic JPEG and reliable per-file ratio metadata are deferred. This is an installable-format prototype, not a physically validated camera release.
+**No camera was accessed or operated by this project; no installation was attempted.** All hardware acceptance rows remain NOT RUN. Native extra panoramic JPEG and reliable per-file ratio metadata are deferred. This is an installable-format prototype, not a physically validated camera release.
